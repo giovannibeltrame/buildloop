@@ -1,5 +1,5 @@
 # BuildLoop
-A simple tool for building tools with AI.
+A simple tool for building software with AI.
 
 ## Purpose
 
@@ -7,7 +7,7 @@ Simplicity is key. Less complexity means more tokens for being used.
 
 ## Workflow
 
-Discovery. Refine. Code. Test. Implement. Loop again 🔄
+Discover. Refine. Code. Test. Implement. Loop again 🔄
 
 ## Core principles, alphabet soup
 
