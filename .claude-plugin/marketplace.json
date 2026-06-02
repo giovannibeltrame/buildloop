@@ -7,7 +7,14 @@
   "plugins": [
     {
       "name": "buildloop",
-      "source": "./plugins/buildloop",
+      "source": {
+        "source": "git-subdir",
+        "url": "giovannibeltrame/buildloop",
+        "path": "plugins/buildloop",
+        "ref": "buildloop--v0.1.0",
+        "sha": "0df857bf6734dafa234125aeffc548d0c4f28017"
+      },
+      "version": "0.1.0",
       "description": "Discover → Refine → Code → Test → Implement loop: a status-flow workflow with TDD, BDD, DDD and quality gates, operationalized as skills + review agents."
     }
   ]
