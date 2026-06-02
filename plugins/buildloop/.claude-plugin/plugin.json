@@ -1,0 +1,12 @@
+{
+  "name": "buildloop",
+  "description": "Operationalizes the BuildLoop workflow (an AGENTS.md operating manual you drop into your repo): create-doc, ddd-refine, implement, log, audit, promote, plus the code-checker, doc-validator and test-writer review agents.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Giovanni Beltrame"
+  },
+  "homepage": "https://github.com/giovannibeltrame/buildloop",
+  "repository": "https://github.com/giovannibeltrame/buildloop",
+  "license": "MIT",
+  "keywords": ["tdd", "bdd", "ddd", "buildloop", "workflow", "quality-gates"]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "buildloop",
+  "owner": {
+    "name": "Giovanni Beltrame"
+  },
+  "description": "BuildLoop — a simple toolkit for building software with AI.",
+  "plugins": [
+    {
+      "name": "buildloop",
+      "source": "./plugins/buildloop",
+      "description": "Discover → Refine → Code → Test → Implement loop: a status-flow workflow with TDD, BDD, DDD and quality gates, operationalized as skills + review agents."
+    }
+  ]
+}

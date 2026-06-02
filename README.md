@@ -28,3 +28,40 @@ Discover. Refine. Code. Test. Implement. Loop again 🔄
 4. one-shot hero
 5. premature victory
 6. fake-tests
+
+## What's here
+
+BuildLoop is a **Claude Code plugin marketplace**. It currently ships one plugin:
+
+- **[`buildloop`](plugins/buildloop/)** — the loop above, made operational: six skills that drive a status flow (refine → plan → implement → review → UAT), three review agents (code-checker, doc-validator, test-writer), a zero-dependency `buildloop` helper, and an `AGENTS.md` operating-manual template you adapt to your repo.
+
+```
+.claude-plugin/marketplace.json   ← marketplace manifest
+plugins/buildloop/              ← the plugin (skills, agents, bin, template)
+```
+
+## Install in any project
+
+From inside a project's Claude Code session:
+
+```
+/plugin marketplace add giovannibeltrame/buildloop
+/plugin install buildloop@buildloop
+```
+
+Or commit it so everyone who clones the project gets it automatically — add to the project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "buildloop": {
+      "source": { "source": "github", "repo": "giovannibeltrame/buildloop" }
+    }
+  },
+  "enabledPlugins": {
+    "buildloop@buildloop": true
+  }
+}
+```
+
+Then follow the plugin's [adoption guide](plugins/buildloop/README.md): drop `templates/AGENTS.md` at your repo root, create `docs/buildloop/{epics,bugfixes,hypotheses,constants}/`, and fill in the `[PROJECT: …]` notes.
