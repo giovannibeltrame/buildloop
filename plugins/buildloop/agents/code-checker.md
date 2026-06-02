@@ -1,6 +1,6 @@
 ---
 name: code-checker
-description: Run after the implementer reports a task done and before any PR is opened or commit is finalized. Specifically: after closing out an epic (`docs/buildloop/epics/`) or bugfix (`docs/buildloop/bugfixes/`); after non-trivial edits to source under a monitored root; whenever a new source file is added under a monitored root (so it's confirmed gated to 100% or listed as non-product). Also on demand for a specific file, module, or branch.
+description: "Run after the implementer reports a task done and before any PR is opened or commit is finalized. Specifically: after closing out an epic (`docs/buildloop/epics/`) or bugfix (`docs/buildloop/bugfixes/`); after non-trivial edits to source under a monitored root; whenever a new source file is added under a monitored root (so it's confirmed gated to 100% or listed as non-product). Also on demand for a specific file, module, or branch."
 model: opus
 tools: Bash, Read, Grep, Glob
 ---
