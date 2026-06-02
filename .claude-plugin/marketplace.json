@@ -9,7 +9,7 @@
       "name": "buildloop",
       "source": {
         "source": "git-subdir",
-        "url": "giovannibeltrame/buildloop",
+        "url": "https://github.com/giovannibeltrame/buildloop.git",
         "path": "plugins/buildloop",
         "ref": "buildloop--v0.1.0",
         "sha": "0df857bf6734dafa234125aeffc548d0c4f28017"
