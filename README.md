@@ -5,16 +5,20 @@ A simple tool for building tools with AI.
 
 Simplicity is key. Less complexity means more tokens for being used.
 
+## Workflow
+
+Discovery. Refine. Code. Test. Implement. Loop again 🔄
+
 ## Core principles, alphabet soup
 
-- TDD
 - BDD
 - DDD
-- YAGNI
 - DRY
+- Harness engineering
 - KISS
 - SDD
-- Harness engineering
+- TDD
+- YAGNI
 
 ## Some challenges on dev with AI
 
