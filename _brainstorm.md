@@ -140,17 +140,16 @@ flowchart TD
 ## Ship it
 
 - SKILL ship-in-prd
-    <!-- TBD: acceptance criteria (unit, integration, e2e tests) must stay alive in feat doc? -->
+    <!-- TBD: acceptance criteria (unit, integration, e2e tests) must stay alive in feat doc? does not ship it has a phase gate, really? -->
     - Questions loop:
         - What changed? Which kind of change? [CHANGELOG.md]
         - Which are the currently behaviors or rules we must keep working? 
         - Which are strict techinical information we must know about this?
-    - Outcome: feature-document.md, CHANGELOG.md
+    - Outcome: feature-document.md, CHANGELOG.md <!-- TBD: partial (users) rollout in prd with CI/CD (check possibility of CI/CD of github + aws ec2)? -->
 
 - SKILL measure
     - Are hypothesis validated or not?
-    - invokes tweak-it (optional)
-    - Outcome: Good enough for full rollout? yes, not yet or never (feature-document.md)
+    - Outcome: Good enough for full rollout? yes, not yet or never (feature-document.md) + invokes tweak-it (optional)
 
 ## Tweak it
 
