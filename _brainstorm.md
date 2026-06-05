@@ -2,7 +2,7 @@
 
 (Re)Think it --> Plan it --> Build it --> Ship it. Loop again.
 
-### Skills map
+## Skills map
 
 | Skill | Change | Notes |
 |---|---|---|
@@ -20,7 +20,7 @@
 | simplify · code-review · security-review · verify | Built-in (CLAUDE) | used as-is in the build-gate |
 | audit · create-doc | Remove | unused |
 
-### Agents map
+## Agents map
 
 | Agent | Change | Notes |
 |---|---|---|
@@ -31,7 +31,7 @@
 | ux-checker | Simplify | build-gate (optional, UI diffs) |
 | test-writer | Remove | unused; tdd owns RED now |
 
-### Docs map
+## Docs map
 
 | Doc | Change | Notes |
 |---|---|---|
@@ -41,16 +41,15 @@
 | CHANGELOG.md | New | — |
 | epic-xxxx.md · fix-xxxx.md · hyp-xxxx.md | Remove | epics/fixes unused; hypotheses live inside fc-xxxx |
 
-Docs lifecycle
+## Docs lifecycle
 - fc-xxxx and bp-xxxx are **working docs** (transient) — archived after ship.
 - feature-document.md is the **living doc** — receives hypotheses + metrics distilled from the working docs, so `measure` has something to read.
 - No `cnst` doc: invariants are guarded by e2e tests and declared in a feature-document "Invariants (e2e-guarded)" section.
 
 ## Design rules
 
-- **Skills run in isolation.** A skill derives its context from the doc/repo state in front of it — never from "what ran before it this session." Every skill and agent is independently invocable; the loop is the happy path, not a cage.
-- **Skills are free; gates are strict.** The loop isn't enforced by controlling which skill runs when. It's enforced by gates that refuse to advance a doc until that phase's artifacts exist and validate. You can run any skill standalone; you just can't cross a gate without the state it checks.
-- **Gates validate state, not history.** A gate checks "are the artifacts present and valid?", not "did skill X run before skill Y?" — that's what lets isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git commit tags; it only bites at the build-gate.)
+- **Skills run in isolation.** A skill derives its context from the doc/repo state in front of it — never from what ran before it this session. Every skill and agent is independently invocable.
+- **Skills are free; gates are strict.** The loop isn't enforced by controlling which skill runs when — it's enforced by gates that refuse to advance a doc until that phase's artifacts exist and validate. Gates check *state* (artifacts present + valid), never *history* (which skill ran). That's what lets isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git tags; it only bites at the build-gate.)
 - **State lives in the log table.** The log table inside each doc is the single source of truth for "where are we" — no separate `Status:` field (it would only drift). This deletes the old AGENTS.md §4.8 status-vs-log sync hook.
     - **Two row kinds.** Most rows are intra-phase *work*; *transition* rows carry a `phase →`. **Current phase = the `phase →` of the most recent transition row.**
 
@@ -63,7 +62,7 @@ Docs lifecycle
     - **Gates don't write — they trigger.** Gates stay read-only validators; on pass, the advancing skill (or Claude) calls log to append the transition row.
     - **No top-of-doc cache** — phase is always derived from the log (max-KISS).
     - **Lifecycle of the log.** Full history lives in `fc-xxxx` / `bp-xxxx` (die on archive after ship). `feature-document.md` keeps only the **last transition**; change history goes to `CHANGELOG.md`.
-- **The build-gate mixes automated and human steps.** Steps 1–6 (ux · simplify · code-checker · code-review · security · verify) are automated; steps 7–8 (PR review · UAT) are human sign-off. So ③ → ④ is deliberately **not** fully automated — a human approves before ship. PR review and UAT are process steps, not skills or agents, so they don't appear in the maps.
+- **The build-gate mixes automated and human steps.** Of its 8 steps (see Build it), 1–6 are automated and 7–8 (PR review · UAT) are human sign-off — so ③ → ④ is deliberately not fully automated. PR review and UAT are process steps, not skills or agents, so they're absent from the maps.
 - **Claude-only for now (YAGNI).** This tool targets Claude exclusively. Built-in Claude skills and agents (`simplify`, `code-review`, `security-review`, `verify`, and the `plan` agent) are coupled directly, not abstracted. An AI-agnostic layer can come later if it's ever needed — not now.
 
 ## Skill contracts
@@ -178,9 +177,9 @@ flowchart TD
 - SKILL interview-me [YAGNI, KISS, DRY]
     - Questions loop:
         - WHAT you want to build and WHY?
-        - What is the narrative that will make this loveable?
-        - Which are the hypothesis for it?
-        - Which metrics would help us decide if is it getting success?
+        - What narrative makes it lovable?
+        - What are the hypotheses?
+        - Which metrics tell us it's succeeding?
     - Outcome: fc-xxxx.md
 
 - SKILL make-prototypes
@@ -188,7 +187,7 @@ flowchart TD
 
 - SKILL does-it-worth [YAGNI, KISS, DRY]
     - Questions loop:
-        - Does it worth to be build? (for each prototype)
+        - Is it worth building? (per prototype)
         - Which prototypes best convey the narrative?
     - Outcome: fc-xxxx.md — one of:
         - yes → think-gate
@@ -196,9 +195,7 @@ flowchart TD
         - park → shelve, revisit via interview-me later
         - never → drop, keep learning
 
-- phase gate
-    - AGENT think-gate
-        - WHAT/WHY + fc has narrative + hypotheses + metrics, prototype(s) exists and had been filtered, does-it-worth decision == "yes"
+- GATE think-gate — fc complete + does-it-worth = yes
 
 ## Plan it
 
@@ -221,11 +218,9 @@ flowchart TD
 - SKILL bdd
     - Outcome: bp-xxxx.md
         - HOW system must behave: acceptance criteria (integration, e2e tests in doc table form)
-        - bdd scenarios (old AGENTS.md: 4.1 BDD scenario format - but in a table format)
+        - bdd scenarios (old AGENTS.md §4.1 format, as a table)
 
-- phase gate
-    - AGENT plan-gate
-        - Validates bp-xxxx (DDD/BDD/acceptance), all phases/steps/tasks unfolded into minimum for each task
+- GATE plan-gate — bp valid (DDD + BDD + every task unfolded)
 
 
 ## Build it
@@ -233,15 +228,15 @@ flowchart TD
 - SKILL tdd
     - Outcome: tests, code
 
-- phase gate (build-gate) IS the sequence below:
-        1. AGENT ux-checker (optional)
-        2. SKILL simplify
-        3. AGENT code-checker
-        4. SKILL code-review
-        5. SKILL security-review
-        6. SKILL verify
-        7. PR review
-        8. UAT
+- GATE build-gate — runs in order:
+    1. AGENT ux-checker (optional)
+    2. SKILL simplify
+    3. AGENT code-checker
+    4. SKILL code-review
+    5. SKILL security-review
+    6. SKILL verify
+    7. PR review
+    8. UAT
     - On fail, bounce to the phase that owns the defect:
         - impl wrong (right scenario) → Build it (back to tdd)
         - scenario wrong (mis-modeled HOW) → Plan it (back to build-plan)
@@ -262,7 +257,7 @@ flowchart TD
         - Infra canary (ALB weighted target groups / CodeDeploy blue-green) is a future change, only if a flag stops being enough.
 
 - SKILL measure
-    - Are hypothesis validated or not?
+    - Are the hypotheses validated?
     - Outcome: Good enough for full rollout? yes, not yet, or invalidated (feature-document.md) + invokes tweak-it (optional)
     - **Telemetry seam** — measure needs live prod data, which no skill produces. The chain that supplies it:
         - Metrics + success threshold are defined in interview-me (fc-xxxx) — the "which metrics tell us success" question.
