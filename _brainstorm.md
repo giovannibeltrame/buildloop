@@ -45,7 +45,48 @@ Docs lifecycle
 - feature-document.md is the **living doc** — receives hypotheses + metrics distilled from the working docs, so `measure` has something to read.
 - No `cnst` doc: invariants are guarded by e2e tests and declared in a feature-document "Invariants (e2e-guarded)" section.
 
-## Loop overview
+## Design rules
+
+- **Skills run in isolation.** A skill derives its context from the doc/repo state in front of it — never from "what ran before it this session." Every skill and agent is independently invocable; the loop is the happy path, not a cage.
+- **Skills are free; gates are strict.** The loop isn't enforced by controlling which skill runs when. It's enforced by gates that refuse to advance a doc until that phase's artifacts exist and validate. You can run any skill standalone; you just can't cross a gate without the state it checks.
+- **Gates validate state, not history.** A gate checks "are the artifacts present and valid?", not "did skill X run before skill Y?" — that's what lets isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git commit tags; it only bites at the build gate.)
+- **State lives in the log table.** The log table inside each doc is the single source of truth for "where are we" — no separate `Status:` field (it would only drift). This deletes the old AGENTS.md §4.8 status-vs-log sync hook.
+    - **Two row kinds.** Most rows are intra-phase *work*; *transition* rows carry a `phase →`. **Current phase = the `phase →` of the most recent transition row.**
+
+      | when | who | phase → | what (≤280) |
+      |---|---|---|---|
+      | … | tdd | — | green: snapshot writer |
+      | … | plan-checker · skill advances | Plan it → Build it | gate passed |
+
+    - **Append-only, single writer.** Only the log skill writes the table; always appends, newest at bottom. That discipline is what makes "last row = state" trustworthy.
+    - **Gates don't write — they trigger.** Gates stay read-only validators; on pass, the advancing skill (or Claude) calls log to append the transition row.
+    - **No top-of-doc cache** — phase is always derived from the log (max-KISS).
+    - **Lifecycle of the log.** Full history lives in `fc-xxxx` / `bp-xxxx` (die on archive after ship). `feature-document.md` keeps only the **last transition**; change history goes to `CHANGELOG.md`.
+
+## Loop overview (phases + gates)
+
+```mermaid
+flowchart LR
+    NEW([New idea]) --> RT
+    CHG([Change to shipped]) --> SH
+
+    RT["① (Re)Think it"] --> G1{{think-checker}}
+    G1 --> PL["② Plan it"]
+    PL --> G2{{plan-checker}}
+    G2 --> BT["③ Build it"]
+    BT --> G3{{build gate}}
+    G3 --> SH["④ Ship it<br/>(measure · tweak-it)"]
+    SH --> DONE([Shipped])
+
+    G3 -.fail · impl.-> BT
+    G3 -.fail · scenario.-> PL
+    G3 -.fail · premise.-> RT
+    SH -.measure: not yet.-> PL
+    SH -.invalidated.-> RT
+    DONE -.next iteration.-> RT
+```
+
+## Loop detail
 
 ```mermaid
 flowchart TD
@@ -59,8 +100,10 @@ flowchart TD
     end
 
     DIW -->|never| DROP([Drop · keep learning])
-    DIW -->|not yet| PARK([Park candidate])
+    DIW -->|not yet · sharpen| IM
+    DIW -->|park · later| PARK([Park candidate])
     DIW -->|yes| TKC{{phase gate<br/>think-checker}}
+    PARK -.revisit.-> IM
 
     TKC --> BPL
 
@@ -83,15 +126,11 @@ flowchart TD
     subgraph SH["④ Ship it (no gate)"]
         BIP[ship-in-prd] --> FD[(feature-document.md<br/>+ CHANGELOG.md)]
         FD --> MEAS{measure<br/>hypothesis validated?}
+        MEAS -->|not yet| TI[tweak-it<br/>bugfix or improvement?]
     end
 
     MEAS -->|yes · rollout| DONE([Shipped])
-    MEAS -->|not yet| TI
     MEAS -->|invalidated| IM
-
-    subgraph TW["⑤ Tweak it (no gate)"]
-        TI[tweak-it<br/>bugfix or improvement?]
-    end
     TI -->|repoints to Plan it| BPL
     DONE -.next iteration.-> IM
 ```
@@ -113,7 +152,11 @@ flowchart TD
     - Questions loop:
         - Does it worth to be build? (for each prototype)
         - Which prototypes best convey the narrative?
-    - Outcome: feature-candidate.md (yes, not yet or never)
+    - Outcome: feature-candidate.md — one of:
+        - yes → think-checker gate
+        - not yet → reloop to interview-me (sharpen WHY/narrative/hypotheses)
+        - park → shelve, revisit via interview-me later
+        - never → drop, keep learning
 
 - phase gate
     - AGENT think-checker
