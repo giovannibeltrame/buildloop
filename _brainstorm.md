@@ -42,15 +42,15 @@
 | epic-xxxx.md · fix-xxxx.md · hyp-xxxx.md | Remove | epics/fixes unused; hypotheses live inside fc-xxxx |
 
 ## Docs lifecycle
-- fc-xxxx and bp-xxxx are **working docs** (transient) — archived after ship.
-- feature-document.md is the **living doc** — receives hypotheses + metrics distilled from the working docs, so `measure` has something to read.
-- No `cnst` doc: invariants are guarded by e2e tests and declared in a feature-document "Invariants (e2e-guarded)" section.
+- fc-xxxx and bp-xxxx are **working docs** (transient); the loop archives them after ship.
+- feature-document.md is the **living doc**. ship distills hypotheses + metrics from the working docs into it, so `measure` has something to read.
+- No `cnst` doc: e2e tests guard the invariants, and a feature-document "Invariants (e2e-guarded)" section declares them.
 
 ## Design rules
 
-- **Skills run in isolation.** A skill derives its context from the doc/repo state in front of it — never from what ran before it this session. Every skill and agent is independently invocable.
-- **Skills are free; gates are strict.** The loop isn't enforced by controlling which skill runs when — it's enforced by gates that refuse to advance a doc until that phase's artifacts exist and validate. Gates check *state* (artifacts present + valid), never *history* (which skill ran). That's what lets isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git tags; it only bites at the build-gate.)
-- **State lives in the log table.** The log table inside each doc is the single source of truth for "where are we" — no separate `Status:` field (it would only drift). This deletes the old AGENTS.md §4.8 status-vs-log sync hook.
+- **Skills run in isolation.** A skill derives its context from the doc/repo state in front of it, never from what ran before it this session. You can invoke every skill and agent on its own.
+- **Skills are free; gates are strict.** Gates enforce the loop, not a fixed skill order: a gate refuses to advance a doc until that phase's artifacts exist and validate. Gates check *state* (artifacts present + valid), never *history* (which skill ran). So isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git tags; it bites only at the build-gate.)
+- **State lives in the log table.** The log table inside each doc is the single source of truth for "where are we," with no separate `Status:` field (it would only drift). Dropping the field removes the old AGENTS.md §4.8 status-vs-log sync hook.
     - **Two row kinds.** Most rows are intra-phase *work*; *transition* rows carry a `phase →`. **Current phase = the `phase →` of the most recent transition row.**
 
       | when | who | phase → | what (≤280) |
@@ -58,16 +58,16 @@
       | … | tdd | — | green: snapshot writer |
       | … | plan-gate · skill advances | Plan it → Build it | gate passed |
 
-    - **Append-only, single writer.** Only the log skill writes the table; always appends, newest at bottom. That discipline is what makes "last row = state" trustworthy.
-    - **Gates don't write — they trigger.** Gates stay read-only validators; on pass, the advancing skill (or Claude) calls log to append the transition row.
-    - **No top-of-doc cache** — phase is always derived from the log (max-KISS).
+    - **Append-only, single writer.** Only the log skill writes the table, and it appends, newest at bottom. That discipline makes "last row = state" trustworthy.
+    - **Gates trigger, never write.** Gates stay read-only validators; on pass, the advancing skill (or Claude) calls log to append the transition row.
+    - **No top-of-doc cache.** Derive the phase from the log (max-KISS).
     - **Lifecycle of the log.** Full history lives in `fc-xxxx` / `bp-xxxx` (die on archive after ship). `feature-document.md` keeps only the **last transition**; change history goes to `CHANGELOG.md`.
-- **The build-gate mixes automated and human steps.** Of its 8 steps (see Build it), 1–6 are automated and 7–8 (PR review · UAT) are human sign-off — so ③ → ④ is deliberately not fully automated. PR review and UAT are process steps, not skills or agents, so they're absent from the maps.
-- **Claude-only for now (YAGNI).** This tool targets Claude exclusively. Built-in Claude skills and agents (`simplify`, `code-review`, `security-review`, `verify`, and the `plan` agent) are coupled directly, not abstracted. An AI-agnostic layer can come later if it's ever needed — not now.
+- **The build-gate mixes automated and human steps.** Of its 8 steps (see Build it), 1–6 run automated and 7–8 (PR review · UAT) need human sign-off, so ③ → ④ stops short of full automation by design. PR review and UAT are process steps, not skills or agents, so the maps omit them.
+- **Claude-only for now (YAGNI).** This tool targets Claude. Built-in Claude skills and agents (`simplify`, `code-review`, `security-review`, `verify`, and the `plan` agent) couple in directly, with no abstraction layer. Add an AI-agnostic layer later if a second target ever lands.
 
 ## Skill contracts
 
-Each skill declares **Requires / Produces / Standalone fallback**. Requires is always a precondition on *state* (artifact present + phase read from the log) — never "skill X ran first." Sequencing emerges because one skill's Requires is another's Produces; neither names the other.
+Each skill declares **Requires / Produces / Standalone fallback**. Requires is a precondition on *state* (artifact present + phase read from the log), never "skill X ran first." The skills sequence themselves because one skill's Requires is another's Produces; neither names the other.
 
 | Skill | Requires (state) | Produces | Standalone fallback |
 |---|---|---|---|
@@ -93,11 +93,11 @@ Each skill declares **Requires / Produces / Standalone fallback**. Requires is a
 | plan-gate | bp valid: DDD + BDD/acceptance, every phase/step/task unfolded to its minimum | ② → ③ |
 | build-gate | tdd outputs clean across the 8-step sequence | ③ → ④ (else bounce: impl→③ · scenario→② · premise→①) |
 
-**Completeness check — two Requires nothing else Produces (external inputs, by design):**
+**Completeness check: two Requires that nothing else Produces (external inputs, by design):**
 - `measure` needs **live prod data** — comes from telemetry on the shipped cohort, not from any doc.
 - `ship-in-prd` needs the **deploy + feature-flag** mechanism (CI/CD GitHub→EC2, release-by-flag) — infra, not a skill output. (See Ship it.)
 
-Everything else chains: each skill's Requires is satisfied by an upstream Produces.
+Everything else chains: an upstream Produces satisfies each skill's Requires.
 
 ## Loop overview (phases + gates)
 
@@ -250,16 +250,16 @@ flowchart TD
         - Behaviors or rules we must keep working [acceptance criteria (unit, integration, e2e tests)]
         - Which are strict techinical information we must know about this?
     - Outcome: feature-document.md, CHANGELOG.md
-    - **Deploy ≠ release** — the seam. ship-in-prd does both, separately:
-        - **Deploy** (artifact reaches the box) — CI/CD, all-or-nothing. GitHub Actions on merge → main: build, then deliver to EC2 via AWS SSM Run Command (no inbound SSH) or rsync/SSH; restart via systemd / docker compose. Binary: the code is on the box or it isn't.
-        - **Release** (who sees it) — a feature flag / cohort gate in the app, not infra. A single EC2 can't split traffic without an ALB + 2 target groups → YAGNI now. ship-in-prd sets the flag to a small launch cohort; the flag name + cohort are recorded in feature-document.md.
+    - **Deploy ≠ release** is the seam. ship-in-prd does both, as separate acts:
+        - **Deploy** (artifact reaches the box): CI/CD, all-or-nothing. GitHub Actions on merge → main: build, then deliver to EC2 via AWS SSM Run Command (no inbound SSH) or rsync/SSH; restart via systemd / docker compose. The code is on the box or it isn't.
+        - **Release** (who sees it): a feature flag / cohort gate in the app, not infra. A single EC2 can't split traffic without an ALB + 2 target groups → YAGNI now. ship-in-prd sets the flag to a small launch cohort and records the flag name + cohort in feature-document.md.
         - Full rollout (measure = yes) = flip the flag to 100%. Rollback = flip to 0%, no redeploy.
         - Infra canary (ALB weighted target groups / CodeDeploy blue-green) is a future change, only if a flag stops being enough.
 
 - SKILL measure
     - Are the hypotheses validated?
     - Outcome: Good enough for full rollout? yes, not yet, or invalidated (feature-document.md) + invokes tweak-it (optional)
-    - **Telemetry seam** — measure needs live prod data, which no skill produces. The chain that supplies it:
+    - **Telemetry seam.** measure needs live prod data, which no skill produces. The chain that supplies it:
         - Metrics + success threshold are defined in interview-me (fc-xxxx) — the "which metrics tell us success" question.
         - They travel into feature-document.md at ship (distilled from fc-xxxx).
         - Build it instruments them: each metric maps to an event/counter the running app emits; a bdd acceptance line can pin "emits metric X" so instrumentation ships with the feature, not bolted on later.
