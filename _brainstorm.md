@@ -31,7 +31,7 @@ Agents map
 Docs map
 - epic-xxxx.md <!-- ✦ TRIM, unused, remove -->
 - fix-xxxx.md <!-- ✦ TRIM, unused, remove -->
-- cnst-xxxx.md <!-- ↪ MAPS rename "feature-document.md" e.g.: signals.md, alerts.md, radar.md, backtest.md. My main idea about this is a "living" doc: every tweak in a feature must update the feature document itself as minimal as possible - no dead docs or infinitely docs list that never get read (KISS, DRY). TBD: what keeps the gate: just integration and e2e-tests? Must acceptance criteria (BDD) stay alive in feature-document and if a tweak change it we update on it? -->
+- cnst-xxxx.md <!-- ↪ MAPS rename "feature-document.md" e.g.: signals.md, alerts.md, radar.md, backtest.md. My main idea about this is a "living" doc: every tweak in a feature must update the feature document itself as minimal as possible - no dead docs or infinitely docs list that never get read (KISS, DRY). -->
 - hyp-xxxx.md  <!-- TRIM, unused, remove: hypotheses are a SECTION inside fc-xxxx -->
 - fc-xxxx.md <!-- ✦ NEW feature candidate -->
 - bp-xxxx.md <!-- ✦ NEW feature-build-plan -->
@@ -44,7 +44,7 @@ flowchart TD
     NEW([New idea / problem]) --> IM
     CHG([Change to a shipped feature]) --> TI
 
-    subgraph RD["① (Re)Discover"]
+    subgraph RT["① (Re)Think it"]
         IM[interview-me<br/>WHY · narrative · hypotheses · metrics] --> FC[(fc-xxxx.md<br/>feature-candidate)]
         FC --> MP[make-prototypes · lo-fi]
         MP --> DIW{does-it-worth?}
@@ -52,23 +52,25 @@ flowchart TD
 
     DIW -->|never| DROP([Drop · keep learning])
     DIW -->|not yet| PARK([Park candidate])
-    DIW -->|yes| BPL
+    DIW -->|yes| TKC{{phase gate<br/>think-checker}}
 
-    subgraph PL["② Plan"]
+    TKC --> BPL
+
+    subgraph PL["② Plan it"]
         BPL[build-plan<br/>sub: ddd + bdd] --> BP[(bp-xxxx.md<br/>phases · WHAT/DDD · HOW/BDD)]
     end
 
-    BP --> TDD
+    BP --> PLC{{phase gate<br/>plan-checker}}
+    PLC --> TDD
 
-    subgraph BT["③ Build & Test"]
-        TDD[tdd · red → green → refactor] --> QG{quality gates<br/>code-checker · doc-validator<br/>security · ux}
-        QG -->|fail| TDD
-        QG -->|pass| VER[verify · UAT]
+    subgraph BT["③ Build it"]
+        TDD[tdd · red → green → refactor] --> BG{{phase gate<br/>ux · security · simplify<br/>code-checker · code-review · verify}}
+        BG -->|fail| TDD
     end
 
-    VER --> BIP
+    BG -->|pass| BIP
 
-    subgraph SH["④ Tweak / Ship"]
+    subgraph SH["④ Ship it (no gate)"]
         BIP[ship-in-prd] --> FD[(feature-document.md<br/>+ CHANGELOG.md)]
         FD --> MEAS{measure<br/>hypothesis validated?}
     end
@@ -77,7 +79,10 @@ flowchart TD
     MEAS -->|not yet| TI
     MEAS -->|invalidated| IM
 
-    TI[tweak-it<br/>bugfix or improvement?] --> TDD
+    subgraph TW["⑤ Tweak it (no gate)"]
+        TI[tweak-it<br/>bugfix or improvement?]
+    end
+    TI -->|repoints to Plan it| BPL
     DONE -.next iteration.-> IM
 ```
 
@@ -102,10 +107,12 @@ flowchart TD
 
 - phase gate
     - AGENT think-checker
+        - WHAT/WHY + fc has narrative + hypotheses + metrics, prototype(s) exists and had been filtered, does-it-worth decision == "yes"
 
 ## Plan it
 
 - SKILL build-plan [YAGNI, KISS, DRY]
+    - Full or lite (lite comes from tweak-it and targets to be thin and fast)
     - Outcome: feature-build-plan.md
         - phases, steps, tasks
         - WHAT we must build [invokes /ddd]
@@ -118,7 +125,7 @@ flowchart TD
 
 - SKILL bdd
     - Outcome: feature-build-plan.md
-        - HOW system must behave
+        - HOW system must behave: acceptance criteria (integration, e2e tests in doc table form)
         - bdd scenarios (old AGENTS.md: 4.1 BDD scenario format - but in a table format)
 
 - phase gate
@@ -129,21 +136,21 @@ flowchart TD
 - SKILL tdd
     - Outcome: tests, code
 
-- phase gate <!-- TBD: must be a new agent responsible for orchestrate all these steps? -->
-    1. AGENT ux-checker (optional)
-    2. SKILL security-review (optional) <!-- TBD: must be optional or always? -->
-    3. SKILL simplify
-    4. AGENT code-checker
-    5. SKILL code-review <!-- TBD: validate intersection between simplify, code-checker and code-review: do either be removed? -->
-    6. SKILL verify
+- phase gate
+    - AGENT build-checker
+        1. AGENT ux-checker (optional)
+        2. SKILL simplify
+        3. AGENT code-checker
+        4. SKILL code-review
+        5. SKILL security-review
+        6. SKILL verify
 
 ## Ship it
 
 - SKILL ship-in-prd
-    <!-- TBD: acceptance criteria (unit, integration, e2e tests) must stay alive in feat doc? does not ship it has a phase gate, really? -->
     - Questions loop:
         - What changed? Which kind of change? [CHANGELOG.md]
-        - Which are the currently behaviors or rules we must keep working? 
+        - Behaviors or rules we must keep working [acceptance criteria (unit, integration, e2e tests)]
         - Which are strict techinical information we must know about this?
     - Outcome: feature-document.md, CHANGELOG.md <!-- TBD: partial (users) rollout in prd with CI/CD (check possibility of CI/CD of github + aws ec2)? -->
 
@@ -151,8 +158,6 @@ flowchart TD
     - Are hypothesis validated or not?
     - Outcome: Good enough for full rollout? yes, not yet or never (feature-document.md) + invokes tweak-it (optional)
 
-## Tweak it
-
 - SKILL tweak-it
     - bugfix or improvement?
-    - Outcome: tests, code, update docs (feature-document.md), invokes /build-plan
+    - Outcome: tests, code, update docs (feature-document.md), invokes /build-plan (options full or lite) <!-- TBD: which option is better for decide full or lite: quantitative data about the fix or empirically by human / AI? -->
