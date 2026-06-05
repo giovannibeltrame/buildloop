@@ -17,18 +17,18 @@
 | measure | New | hypotheses flow; closes the hyp-loop |
 | tweak-it | New | bugfix or improvement; picks build-plan full/lite |
 | log | Improved | table format, WHO changed WHAT ≤280 chars; called on every skill/agent mod; off-mermaid (touches every edge) |
-| simplify · code-review · security-review · verify | Built-in (CLAUDE) | used as-is in the build gate |
+| simplify · code-review · security-review · verify | Built-in (CLAUDE) | used as-is in the build-gate |
 | audit · create-doc | Remove | unused |
 
 ### Agents map
 
 | Agent | Change | Notes |
 |---|---|---|
-| think-checker | New | gate ① → ②; validates fc-xxxx |
-| plan-checker | Renamed (from doc-validator) + simplify | gate ② → ③; validates bp-xxxx (DDD/BDD/acceptance) |
+| think-gate | New | gate ① → ②; validates fc-xxxx |
+| plan-gate | Renamed (from doc-validator) + simplify | gate ② → ③; validates bp-xxxx (DDD/BDD/acceptance) |
 | plan | Built-in (CLAUDE agent) | architect sub of build-plan — phases/steps/tasks, critical files, trade-offs |
-| code-checker | Simplify | build gate |
-| ux-checker | Simplify | build gate (optional, UI diffs) |
+| code-checker | Simplify | build-gate |
+| ux-checker | Simplify | build-gate (optional, UI diffs) |
 | test-writer | Remove | unused; tdd owns RED now |
 
 ### Docs map
@@ -50,20 +50,20 @@ Docs lifecycle
 
 - **Skills run in isolation.** A skill derives its context from the doc/repo state in front of it — never from "what ran before it this session." Every skill and agent is independently invocable; the loop is the happy path, not a cage.
 - **Skills are free; gates are strict.** The loop isn't enforced by controlling which skill runs when. It's enforced by gates that refuse to advance a doc until that phase's artifacts exist and validate. You can run any skill standalone; you just can't cross a gate without the state it checks.
-- **Gates validate state, not history.** A gate checks "are the artifacts present and valid?", not "did skill X run before skill Y?" — that's what lets isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git commit tags; it only bites at the build gate.)
+- **Gates validate state, not history.** A gate checks "are the artifacts present and valid?", not "did skill X run before skill Y?" — that's what lets isolated use and the guaranteed loop coexist. (Exception: TDD red-first is history-based, audited in git commit tags; it only bites at the build-gate.)
 - **State lives in the log table.** The log table inside each doc is the single source of truth for "where are we" — no separate `Status:` field (it would only drift). This deletes the old AGENTS.md §4.8 status-vs-log sync hook.
     - **Two row kinds.** Most rows are intra-phase *work*; *transition* rows carry a `phase →`. **Current phase = the `phase →` of the most recent transition row.**
 
       | when | who | phase → | what (≤280) |
       |---|---|---|---|
       | … | tdd | — | green: snapshot writer |
-      | … | plan-checker · skill advances | Plan it → Build it | gate passed |
+      | … | plan-gate · skill advances | Plan it → Build it | gate passed |
 
     - **Append-only, single writer.** Only the log skill writes the table; always appends, newest at bottom. That discipline is what makes "last row = state" trustworthy.
     - **Gates don't write — they trigger.** Gates stay read-only validators; on pass, the advancing skill (or Claude) calls log to append the transition row.
     - **No top-of-doc cache** — phase is always derived from the log (max-KISS).
     - **Lifecycle of the log.** Full history lives in `fc-xxxx` / `bp-xxxx` (die on archive after ship). `feature-document.md` keeps only the **last transition**; change history goes to `CHANGELOG.md`.
-- **The build gate mixes automated and human steps.** Steps 1–6 (ux · simplify · code-checker · code-review · security · verify) are automated; steps 7–8 (PR review · UAT) are human sign-off. So ③ → ④ is deliberately **not** fully automated — a human approves before ship. PR review and UAT are process steps, not skills or agents, so they don't appear in the maps.
+- **The build-gate mixes automated and human steps.** Steps 1–6 (ux · simplify · code-checker · code-review · security · verify) are automated; steps 7–8 (PR review · UAT) are human sign-off. So ③ → ④ is deliberately **not** fully automated — a human approves before ship. PR review and UAT are process steps, not skills or agents, so they don't appear in the maps.
 - **Claude-only for now (YAGNI).** This tool targets Claude exclusively. Built-in Claude skills and agents (`simplify`, `code-review`, `security-review`, `verify`, and the `plan` agent) are coupled directly, not abstracted. An AI-agnostic layer can come later if it's ever needed — not now.
 
 ## Skill contracts
@@ -75,13 +75,13 @@ Each skill declares **Requires / Produces / Standalone fallback**. Requires is a
 | interview-me | — (entry); or an existing fc to re-sharpen | fc-xxxx (WHY · narrative · hypotheses · metrics) | works anywhere; creates a new fc |
 | make-prototypes | fc-xxxx exists | lo-fi prototypes in fc | asks for / stubs a minimal fc |
 | does-it-worth | fc-xxxx + prototypes present | verdict in fc (yes / not yet / park / never) | refuses; names what's missing |
-| build-plan | fc-xxxx past think-checker (phase ②); or lite entry from tweak-it | bp-xxxx (phases · WHAT/DDD · HOW/BDD) | runs on a given fc; flags if gate not passed |
+| build-plan | fc-xxxx past think-gate (phase ②); or lite entry from tweak-it | bp-xxxx (phases · WHAT/DDD · HOW/BDD) | runs on a given fc; flags if gate not passed |
 | ddd | bp-xxxx (or invoked by build-plan) | WHAT + ubiquitous language in bp | operates on the doc handed to it |
 | bdd | bp-xxxx (or invoked by build-plan) | acceptance criteria + BDD scenarios (table) in bp | operates on the doc handed to it |
 | plan (CLAUDE agent) | bp-xxxx (or invoked by build-plan) | phases/steps/tasks + critical files + trade-offs in bp | operates on the doc handed to it |
-| tdd | bp-xxxx past plan-checker (phase ③) | tests + code (red→green→refactor commits) | runs on a given file, ungated |
+| tdd | bp-xxxx past plan-gate (phase ③) | tests + code (red→green→refactor commits) | runs on a given file, ungated |
 | simplify · code-review · security-review · verify | a diff (verify also needs running app + bp scenarios) | cleanups / findings / UAT verdict | run on any diff |
-| ship-in-prd | build gate green (per log) | feature-document.md + CHANGELOG.md | refuses; names the missing gate |
+| ship-in-prd | build-gate green (per log) | feature-document.md + CHANGELOG.md | refuses; names the missing gate |
 | measure | feature-document w/ hypotheses + metrics + **live prod data** | rollout verdict (yes / not yet / invalidated) | refuses if no metrics defined |
 | tweak-it | a shipped feature-document | full/lite build-plan invocation (sets re-entry phase) | operates on the named feature |
 | log | a doc (creates the log table if missing) | appended row (work or transition) | creates the table |
@@ -90,9 +90,9 @@ Each skill declares **Requires / Produces / Standalone fallback**. Requires is a
 
 | Gate | Requires | Emits |
 |---|---|---|
-| think-checker | fc complete: narrative + hypotheses + metrics, prototype(s) filtered, does-it-worth = yes | ① → ② |
-| plan-checker | bp valid: DDD + BDD/acceptance, every phase/step/task unfolded to its minimum | ② → ③ |
-| build gate | tdd outputs clean across the 8-step sequence | ③ → ④ (else bounce: impl→③ · scenario→② · premise→①) |
+| think-gate | fc complete: narrative + hypotheses + metrics, prototype(s) filtered, does-it-worth = yes | ① → ② |
+| plan-gate | bp valid: DDD + BDD/acceptance, every phase/step/task unfolded to its minimum | ② → ③ |
+| build-gate | tdd outputs clean across the 8-step sequence | ③ → ④ (else bounce: impl→③ · scenario→② · premise→①) |
 
 **Completeness check — two Requires nothing else Produces (external inputs, by design):**
 - `measure` needs **live prod data** — comes from telemetry on the shipped cohort, not from any doc.
@@ -107,11 +107,11 @@ flowchart LR
     NEW([New idea]) --> RT
     CHG([Change to shipped]) --> SH
 
-    RT["① (Re)Think it"] --> G1{{think-checker}}
+    RT["① (Re)Think it"] --> G1{{think-gate}}
     G1 --> PL["② Plan it"]
-    PL --> G2{{plan-checker}}
+    PL --> G2{{plan-gate}}
     G2 --> BT["③ Build it"]
-    BT --> G3{{build gate}}
+    BT --> G3{{build-gate}}
     G3 --> SH["④ Ship it<br/>(measure · tweak-it)"]
     SH --> DONE([Shipped])
 
@@ -139,7 +139,7 @@ flowchart TD
     DIW -->|never| DROP([Drop · keep learning])
     DIW -->|not yet · sharpen| IM
     DIW -->|park · later| PARK([Park candidate])
-    DIW -->|yes| TKC{{phase gate<br/>think-checker}}
+    DIW -->|yes| TKC{{think-gate}}
     PARK -.revisit.-> IM
 
     TKC --> BPL
@@ -148,11 +148,11 @@ flowchart TD
         BPL[build-plan<br/>sub: ddd + bdd + plan] --> BP[(bp-xxxx.md<br/>phases · WHAT/DDD · HOW/BDD)]
     end
 
-    BP --> PLC{{phase gate<br/>plan-checker}}
+    BP --> PLC{{plan-gate}}
     PLC --> TDD
 
     subgraph BT["③ Build it"]
-        TDD[tdd · red → green → refactor] --> BG{{build gate<br/>ux · simplify · code-checker<br/>code-review · security · verify<br/>PR review · UAT}}
+        TDD[tdd · red → green → refactor] --> BG{{build-gate<br/>ux · simplify · code-checker<br/>code-review · security · verify<br/>PR review · UAT}}
         BG -->|fail · impl wrong| TDD
     end
 
@@ -191,13 +191,13 @@ flowchart TD
         - Does it worth to be build? (for each prototype)
         - Which prototypes best convey the narrative?
     - Outcome: fc-xxxx.md — one of:
-        - yes → think-checker gate
+        - yes → think-gate
         - not yet → reloop to interview-me (sharpen WHY/narrative/hypotheses)
         - park → shelve, revisit via interview-me later
         - never → drop, keep learning
 
 - phase gate
-    - AGENT think-checker
+    - AGENT think-gate
         - WHAT/WHY + fc has narrative + hypotheses + metrics, prototype(s) exists and had been filtered, does-it-worth decision == "yes"
 
 ## Plan it
@@ -224,7 +224,7 @@ flowchart TD
         - bdd scenarios (old AGENTS.md: 4.1 BDD scenario format - but in a table format)
 
 - phase gate
-    - AGENT plan-checker
+    - AGENT plan-gate
         - Validates bp-xxxx (DDD/BDD/acceptance), all phases/steps/tasks unfolded into minimum for each task
 
 
@@ -233,7 +233,7 @@ flowchart TD
 - SKILL tdd
     - Outcome: tests, code
 
-- phase gate (build gate) IS the sequence below:
+- phase gate (build-gate) IS the sequence below:
         1. AGENT ux-checker (optional)
         2. SKILL simplify
         3. AGENT code-checker
@@ -255,10 +255,23 @@ flowchart TD
         - Behaviors or rules we must keep working [acceptance criteria (unit, integration, e2e tests)]
         - Which are strict techinical information we must know about this?
     - Outcome: feature-document.md, CHANGELOG.md
+    - **Deploy ≠ release** — the seam. ship-in-prd does both, separately:
+        - **Deploy** (artifact reaches the box) — CI/CD, all-or-nothing. GitHub Actions on merge → main: build, then deliver to EC2 via AWS SSM Run Command (no inbound SSH) or rsync/SSH; restart via systemd / docker compose. Binary: the code is on the box or it isn't.
+        - **Release** (who sees it) — a feature flag / cohort gate in the app, not infra. A single EC2 can't split traffic without an ALB + 2 target groups → YAGNI now. ship-in-prd sets the flag to a small launch cohort; the flag name + cohort are recorded in feature-document.md.
+        - Full rollout (measure = yes) = flip the flag to 100%. Rollback = flip to 0%, no redeploy.
+        - Infra canary (ALB weighted target groups / CodeDeploy blue-green) is a future change, only if a flag stops being enough.
 
 - SKILL measure
     - Are hypothesis validated or not?
     - Outcome: Good enough for full rollout? yes, not yet, or invalidated (feature-document.md) + invokes tweak-it (optional)
+    - **Telemetry seam** — measure needs live prod data, which no skill produces. The chain that supplies it:
+        - Metrics + success threshold are defined in interview-me (fc-xxxx) — the "which metrics tell us success" question.
+        - They travel into feature-document.md at ship (distilled from fc-xxxx).
+        - Build it instruments them: each metric maps to an event/counter the running app emits; a bdd acceptance line can pin "emits metric X" so instrumentation ships with the feature, not bolted on later.
+        - ship-in-prd's release flag tags the cohort, so metric values are attributable to the launched cohort vs baseline.
+        - measure reads the cohort's values from the telemetry sink [PROJECT: dashboard / query / metrics store] and compares to the threshold from fc-xxxx.
+        - yes → threshold met (flip flag to 100%) · not yet → inconclusive (tweak-it) · invalidated → threshold clearly missed (re-think).
+    - Closes the hyp-loop: hypothesis + metric defined in ①, instrumented in ③, released to a cohort in ④, judged here in ④.
 
 - SKILL tweak-it
     - bugfix or improvement?
