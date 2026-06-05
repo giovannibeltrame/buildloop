@@ -8,8 +8,8 @@
 |---|---|---|
 | interview-me | New | "never guess, always ask" discipline |
 | make-prototypes | New | lo-fi UX prototypes |
-| does-it-worth | New | filters prototypes → yes / not yet / never |
-| build-plan | New | orchestrates ddd + bdd; full or lite |
+| does-it-worth | New | filters prototypes → yes / not yet / park / never |
+| build-plan | New | orchestrates ddd + bdd + plan; full or lite |
 | ddd | Renamed (from ddd-refine) | sub-invoked by build-plan |
 | bdd | New | sub-invoked by build-plan |
 | tdd | Renamed (from implement) | executes build plan step by step; owns red → green → refactor |
@@ -26,6 +26,7 @@
 |---|---|---|
 | think-checker | New | gate ① → ②; validates fc-xxxx |
 | plan-checker | Renamed (from doc-validator) + simplify | gate ② → ③; validates bp-xxxx (DDD/BDD/acceptance) |
+| plan | Built-in (CLAUDE agent) | architect sub of build-plan — phases/steps/tasks, critical files, trade-offs |
 | code-checker | Simplify | build gate |
 | ux-checker | Simplify | build gate (optional, UI diffs) |
 | test-writer | Remove | unused; tdd owns RED now |
@@ -62,6 +63,8 @@ Docs lifecycle
     - **Gates don't write — they trigger.** Gates stay read-only validators; on pass, the advancing skill (or Claude) calls log to append the transition row.
     - **No top-of-doc cache** — phase is always derived from the log (max-KISS).
     - **Lifecycle of the log.** Full history lives in `fc-xxxx` / `bp-xxxx` (die on archive after ship). `feature-document.md` keeps only the **last transition**; change history goes to `CHANGELOG.md`.
+- **The build gate mixes automated and human steps.** Steps 1–6 (ux · simplify · code-checker · code-review · security · verify) are automated; steps 7–8 (PR review · UAT) are human sign-off. So ③ → ④ is deliberately **not** fully automated — a human approves before ship. PR review and UAT are process steps, not skills or agents, so they don't appear in the maps.
+- **Claude-only for now (YAGNI).** This tool targets Claude exclusively. Built-in Claude skills and agents (`simplify`, `code-review`, `security-review`, `verify`, and the `plan` agent) are coupled directly, not abstracted. An AI-agnostic layer can come later if it's ever needed — not now.
 
 ## Skill contracts
 
@@ -75,10 +78,11 @@ Each skill declares **Requires / Produces / Standalone fallback**. Requires is a
 | build-plan | fc-xxxx past think-checker (phase ②); or lite entry from tweak-it | bp-xxxx (phases · WHAT/DDD · HOW/BDD) | runs on a given fc; flags if gate not passed |
 | ddd | bp-xxxx (or invoked by build-plan) | WHAT + ubiquitous language in bp | operates on the doc handed to it |
 | bdd | bp-xxxx (or invoked by build-plan) | acceptance criteria + BDD scenarios (table) in bp | operates on the doc handed to it |
+| plan (CLAUDE agent) | bp-xxxx (or invoked by build-plan) | phases/steps/tasks + critical files + trade-offs in bp | operates on the doc handed to it |
 | tdd | bp-xxxx past plan-checker (phase ③) | tests + code (red→green→refactor commits) | runs on a given file, ungated |
 | simplify · code-review · security-review · verify | a diff (verify also needs running app + bp scenarios) | cleanups / findings / UAT verdict | run on any diff |
 | ship-in-prd | build gate green (per log) | feature-document.md + CHANGELOG.md | refuses; names the missing gate |
-| measure | feature-document w/ hypotheses + metrics + **live prod data** | rollout verdict (yes / not yet / never) | refuses if no metrics defined |
+| measure | feature-document w/ hypotheses + metrics + **live prod data** | rollout verdict (yes / not yet / invalidated) | refuses if no metrics defined |
 | tweak-it | a shipped feature-document | full/lite build-plan invocation (sets re-entry phase) | operates on the named feature |
 | log | a doc (creates the log table if missing) | appended row (work or transition) | creates the table |
 
@@ -141,7 +145,7 @@ flowchart TD
     TKC --> BPL
 
     subgraph PL["② Plan it"]
-        BPL[build-plan<br/>sub: ddd + bdd] --> BP[(bp-xxxx.md<br/>phases · WHAT/DDD · HOW/BDD)]
+        BPL[build-plan<br/>sub: ddd + bdd + plan] --> BP[(bp-xxxx.md<br/>phases · WHAT/DDD · HOW/BDD)]
     end
 
     BP --> PLC{{phase gate<br/>plan-checker}}
@@ -177,7 +181,7 @@ flowchart TD
         - What is the narrative that will make this loveable?
         - Which are the hypothesis for it?
         - Which metrics would help us decide if is it getting success?
-    - Outcome: feature-candidate.md
+    - Outcome: fc-xxxx.md
 
 - SKILL make-prototypes
     - Outcome: UX prototypes (lo-fi)
@@ -186,7 +190,7 @@ flowchart TD
     - Questions loop:
         - Does it worth to be build? (for each prototype)
         - Which prototypes best convey the narrative?
-    - Outcome: feature-candidate.md — one of:
+    - Outcome: fc-xxxx.md — one of:
         - yes → think-checker gate
         - not yet → reloop to interview-me (sharpen WHY/narrative/hypotheses)
         - park → shelve, revisit via interview-me later
@@ -200,18 +204,22 @@ flowchart TD
 
 - SKILL build-plan [YAGNI, KISS, DRY]
     - Full or lite (lite comes from tweak-it and targets to be thin and fast)
-    - Outcome: feature-build-plan.md
-        - phases, steps, tasks
+    - Outcome: bp-xxxx.md
+        - phases, steps, tasks [invokes plan agent]
         - WHAT we must build [invokes /ddd]
         - HOW system must behave (acceptance criteria) [invokes /bdd]
 
+- AGENT plan (CLAUDE)
+    - Outcome: bp-xxxx.md
+        - phases, steps, tasks (decomposition), critical files, trade-offs
+
 - SKILL ddd
-    - Outcome: feature-build-plan.md
+    - Outcome: bp-xxxx.md
         - WHAT we must build
         - Ubiquitous Language
 
 - SKILL bdd
-    - Outcome: feature-build-plan.md
+    - Outcome: bp-xxxx.md
         - HOW system must behave: acceptance criteria (integration, e2e tests in doc table form)
         - bdd scenarios (old AGENTS.md: 4.1 BDD scenario format - but in a table format)
 
@@ -250,7 +258,7 @@ flowchart TD
 
 - SKILL measure
     - Are hypothesis validated or not?
-    - Outcome: Good enough for full rollout? yes, not yet or never (feature-document.md) + invokes tweak-it (optional)
+    - Outcome: Good enough for full rollout? yes, not yet, or invalidated (feature-document.md) + invokes tweak-it (optional)
 
 - SKILL tweak-it
     - bugfix or improvement?
