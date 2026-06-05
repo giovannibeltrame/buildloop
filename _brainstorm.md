@@ -63,6 +63,39 @@ Docs lifecycle
     - **No top-of-doc cache** — phase is always derived from the log (max-KISS).
     - **Lifecycle of the log.** Full history lives in `fc-xxxx` / `bp-xxxx` (die on archive after ship). `feature-document.md` keeps only the **last transition**; change history goes to `CHANGELOG.md`.
 
+## Skill contracts
+
+Each skill declares **Requires / Produces / Standalone fallback**. Requires is always a precondition on *state* (artifact present + phase read from the log) — never "skill X ran first." Sequencing emerges because one skill's Requires is another's Produces; neither names the other.
+
+| Skill | Requires (state) | Produces | Standalone fallback |
+|---|---|---|---|
+| interview-me | — (entry); or an existing fc to re-sharpen | fc-xxxx (WHY · narrative · hypotheses · metrics) | works anywhere; creates a new fc |
+| make-prototypes | fc-xxxx exists | lo-fi prototypes in fc | asks for / stubs a minimal fc |
+| does-it-worth | fc-xxxx + prototypes present | verdict in fc (yes / not yet / park / never) | refuses; names what's missing |
+| build-plan | fc-xxxx past think-checker (phase ②); or lite entry from tweak-it | bp-xxxx (phases · WHAT/DDD · HOW/BDD) | runs on a given fc; flags if gate not passed |
+| ddd | bp-xxxx (or invoked by build-plan) | WHAT + ubiquitous language in bp | operates on the doc handed to it |
+| bdd | bp-xxxx (or invoked by build-plan) | acceptance criteria + BDD scenarios (table) in bp | operates on the doc handed to it |
+| tdd | bp-xxxx past plan-checker (phase ③) | tests + code (red→green→refactor commits) | runs on a given file, ungated |
+| simplify · code-review · security-review · verify | a diff (verify also needs running app + bp scenarios) | cleanups / findings / UAT verdict | run on any diff |
+| ship-in-prd | build gate green (per log) | feature-document.md + CHANGELOG.md | refuses; names the missing gate |
+| measure | feature-document w/ hypotheses + metrics + **live prod data** | rollout verdict (yes / not yet / never) | refuses if no metrics defined |
+| tweak-it | a shipped feature-document | full/lite build-plan invocation (sets re-entry phase) | operates on the named feature |
+| log | a doc (creates the log table if missing) | appended row (work or transition) | creates the table |
+
+**Gate contracts** (agents — read-only; on pass, the advancing skill writes the transition row):
+
+| Gate | Requires | Emits |
+|---|---|---|
+| think-checker | fc complete: narrative + hypotheses + metrics, prototype(s) filtered, does-it-worth = yes | ① → ② |
+| plan-checker | bp valid: DDD + BDD/acceptance, every phase/step/task unfolded to its minimum | ② → ③ |
+| build gate | tdd outputs clean across the 8-step sequence | ③ → ④ (else bounce: impl→③ · scenario→② · premise→①) |
+
+**Completeness check — two Requires nothing else Produces (external inputs, by design):**
+- `measure` needs **live prod data** — comes from telemetry on the shipped cohort, not from any doc.
+- `ship-in-prd` needs the **deploy + feature-flag** mechanism (CI/CD GitHub→EC2, release-by-flag) — infra, not a skill output. (See Ship it.)
+
+Everything else chains: each skill's Requires is satisfied by an upstream Produces.
+
 ## Loop overview (phases + gates)
 
 ```mermaid
@@ -81,8 +114,8 @@ flowchart LR
     G3 -.fail · impl.-> BT
     G3 -.fail · scenario.-> PL
     G3 -.fail · premise.-> RT
-    SH -.measure: not yet.-> PL
-    SH -.invalidated.-> RT
+    SH -.tweak · lite.-> PL
+    SH -.tweak · full / invalidated.-> RT
     DONE -.next iteration.-> RT
 ```
 
@@ -131,7 +164,8 @@ flowchart TD
 
     MEAS -->|yes · rollout| DONE([Shipped])
     MEAS -->|invalidated| IM
-    TI -->|repoints to Plan it| BPL
+    TI -->|lite · WHY stands| BPL
+    TI -->|full · scope changed| IM
     DONE -.next iteration.-> IM
 ```
 
@@ -224,3 +258,6 @@ flowchart TD
     - Default LITE, escalate to FULL on an explicit scope trigger (a short checklist tweak-it runs, AI-assisted but rule-anchored):
         - FULL if any: touches a constant/contract, crosses a component boundary (new integration/e2e scenarios), changes the data model, or moves a hypothesis/metric.
         - else LITE (bugfix or local improvement).
+    - Full vs lite = **where you re-enter the loop**:
+        - LITE → re-enters at Plan it (thin build-plan; WHY/narrative unchanged)
+        - FULL → re-enters at (Re)Think it (premise/scope moved; re-interview → re-worth → full build-plan)
