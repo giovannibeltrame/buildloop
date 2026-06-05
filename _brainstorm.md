@@ -2,40 +2,48 @@
 
 (Re)Think it --> Plan it --> Build it --> Ship it. Loop again.
 
-Skills map
-- audit <!-- ✦ TRIM, unused, remove -->
-- create-doc <!-- ✦ TRIM, unused, remove -->
-- ddd-refine <!-- ↪ MAPS rename "ddd", sub-invoked by build-plan -->
-- implement <!-- ↪ MAPS rename "tdd", only executes build plan stepy by step using TDD, nothing more. Owns green, red, refactor loop. -->
-- log <!-- ↪ MAPS improved, changed to write in new docs and better format (table) and WHO changed WHAT in max. 280 chars. Called by every skill or agent mod. Not drawn in the mermaid on purpose; it would touch every edge. -->
-- promote <!-- ↪ MAPS REPURPOSE "ship-in-prd" every feature bringed in prd MUST pass on quality gates, have e2e tests -->
-- interview-me <!-- ✦ NEW never guess, always ask" discipline -->
-- bdd <!-- ✦ NEW, sub-invoked by build-plan -->
-- build-plan <!-- ✦ NEW -->
-- measure <!-- ↪ MAPS to the hypotheses flow and closes hyp-loop -->
-- make-prototypes <!-- ✦ NEW -->
-- does-it-worth <!-- ✦ NEW -->
-- tweak-it <!-- ✦ NEW -->
-- simplify (CLAUDE)
-- code-review (CLAUDE)
-- security-review (CLAUDE)
-- verify (CLAUDE)
+### Skills map
 
-Agents map
-- think-checker <!-- ✦ NEW -->
-- doc-validator <!-- ✦  ↪ MAPS rename "plan-checker" + make it simple on bp-xxxx (build-plan) -->
-- code-checker  <!-- ✦ TRIM make it simple -->
-- test-writer <!-- ✦ TRIM, unused, remove -->
-- ux-checker  <!-- ✦ TRIM make it simple -->
+| Skill | Change | Notes |
+|---|---|---|
+| interview-me | New | "never guess, always ask" discipline |
+| make-prototypes | New | lo-fi UX prototypes |
+| does-it-worth | New | filters prototypes → yes / not yet / never |
+| build-plan | New | orchestrates ddd + bdd; full or lite |
+| ddd | Renamed (from ddd-refine) | sub-invoked by build-plan |
+| bdd | New | sub-invoked by build-plan |
+| tdd | Renamed (from implement) | executes build plan step by step; owns red → green → refactor |
+| ship-in-prd | Repurposed (from promote) | every feature in prd MUST pass quality gates + have e2e tests |
+| measure | New | hypotheses flow; closes the hyp-loop |
+| tweak-it | New | bugfix or improvement; picks build-plan full/lite |
+| log | Improved | table format, WHO changed WHAT ≤280 chars; called on every skill/agent mod; off-mermaid (touches every edge) |
+| simplify · code-review · security-review · verify | Built-in (CLAUDE) | used as-is in the build gate |
+| audit · create-doc | Remove | unused |
 
-Docs map
-- epic-xxxx.md <!-- ✦ TRIM, unused, remove -->
-- fix-xxxx.md <!-- ✦ TRIM, unused, remove -->
-- cnst-xxxx.md <!-- ↪ MAPS rename "feature-document.md" e.g.: signals.md, alerts.md, radar.md, backtest.md. My main idea about this is a "living" doc: every tweak in a feature must update the feature document itself as minimal as possible - no dead docs or infinitely docs list that never get read (KISS, DRY). -->
-- hyp-xxxx.md  <!-- TRIM, unused, remove: hypotheses are a SECTION inside fc-xxxx -->
-- fc-xxxx.md <!-- ✦ NEW feature candidate -->
-- bp-xxxx.md <!-- ✦ NEW feature-build-plan -->
-- CHANGELOG.md <!-- ✦ NEW -->
+### Agents map
+
+| Agent | Change | Notes |
+|---|---|---|
+| think-checker | New | gate ① → ②; validates fc-xxxx |
+| plan-checker | Renamed (from doc-validator) + simplify | gate ② → ③; validates bp-xxxx (DDD/BDD/acceptance) |
+| code-checker | Simplify | build gate |
+| ux-checker | Simplify | build gate (optional, UI diffs) |
+| test-writer | Remove | unused; tdd owns RED now |
+
+### Docs map
+
+| Doc | Change | Notes |
+|---|---|---|
+| fc-xxxx.md | New | feature candidate (hypotheses = a section here) |
+| bp-xxxx.md | New | feature build plan |
+| feature-document.md | Renamed (from cnst-xxxx) | living doc; minimal per-tweak updates (e.g. signals.md, alerts.md, radar.md) |
+| CHANGELOG.md | New | — |
+| epic-xxxx.md · fix-xxxx.md · hyp-xxxx.md | Remove | epics/fixes unused; hypotheses live inside fc-xxxx |
+
+Docs lifecycle
+- fc-xxxx and bp-xxxx are **working docs** (transient) — archived after ship.
+- feature-document.md is the **living doc** — receives hypotheses + metrics distilled from the working docs, so `measure` has something to read.
+- No `cnst` doc: invariants are guarded by e2e tests and declared in a feature-document "Invariants (e2e-guarded)" section.
 
 ## Loop overview
 
@@ -60,14 +68,16 @@ flowchart TD
         BPL[build-plan<br/>sub: ddd + bdd] --> BP[(bp-xxxx.md<br/>phases · WHAT/DDD · HOW/BDD)]
     end
 
-    BP --> PLC{{phase gate<br/>doc-validator}}
+    BP --> PLC{{phase gate<br/>plan-checker}}
     PLC --> TDD
 
     subgraph BT["③ Build it"]
-        TDD[tdd · red → green → refactor] --> BG{{phase gate<br/>ux · security · simplify<br/>code-checker · code-review · verify}}
-        BG -->|fail| TDD
+        TDD[tdd · red → green → refactor] --> BG{{build gate<br/>ux · simplify · code-checker<br/>code-review · security · verify<br/>PR review · UAT}}
+        BG -->|fail · impl wrong| TDD
     end
 
+    BG -->|fail · scenario wrong| BPL
+    BG -->|fail · premise wrong| IM
     BG -->|pass| BIP
 
     subgraph SH["④ Ship it (no gate)"]
@@ -147,6 +157,10 @@ flowchart TD
         6. SKILL verify
         7. PR review
         8. UAT
+    - On fail, bounce to the phase that owns the defect:
+        - impl wrong (right scenario) → Build it (back to tdd)
+        - scenario wrong (mis-modeled HOW) → Plan it (back to build-plan)
+        - premise wrong (WHAT/WHY off) → (Re)Think it (back to interview-me)
 
 ## Ship it
 
@@ -167,19 +181,3 @@ flowchart TD
     - Default LITE, escalate to FULL on an explicit scope trigger (a short checklist tweak-it runs, AI-assisted but rule-anchored):
         - FULL if any: touches a constant/contract, crosses a component boundary (new integration/e2e scenarios), changes the data model, or moves a hypothesis/metric.
         - else LITE (bugfix or local improvement).
-
-## Claude round — 4 gaps that need your call
-
-These aren't naming nits (I fixed those inline); they're real design forks I shouldn't pick for you.
-
-1. **Where does human UAT live now?** Old AGENTS.md puts `/verify` at 6→7 as human-in-the-loop UAT. The new loop folds `verify` into the *automated* build gate (③) and marks Ship "no gate". So either (a) the build gate now contains the human UAT touch, or (b) human acceptance moved to Ship and `verify` here is just an automated smoke. Pick one — it changes whether ③→④ is fully automatable.
-A: I put PR Review + UAT as new steps in build it gate.
-
-2. **Doc lifecycle: fc → bp → feature-document.** Three docs across the loop. My read: `fc-xxxx` (Think) and `bp-xxxx` (Plan/Build) are *working docs*, distilled into the *living* `feature-document.md` at Ship — and the hypotheses+metrics defined in `fc` must carry through so `measure` can close them. Confirm fc/bp are transient (archived after ship) vs. also living. If the hypotheses don't travel, `measure` has nothing to read.
-A: Yes let's follow your call: fc-xxxx and bp-xxxx are working docs (transient) and feature-document "living" that receive hypotheses and metrics from working docs.
-
-3. **The "constant / platform truth" concept is being dropped.** `cnst-xxxx` is renamed to `feature-document.md`, but a constant (a truth the system must never accidentally break, e2e-guarded) is a *different idea* from a living feature doc. Renaming collapses the two. Intended? If yes, the loop loses its anti-regression anchor — worth a deliberate "we don't need constants" call, not a side effect of a rename.
-A: Intended. Our e2e tests will guarantee that our invariant from each feature will keep working.
-
-4. **`test-writer` removed → who owns RED?** Marked TRIM/remove, which means the `tdd` skill now authors its own failing tests. Fine, but AGENTS.md §4.2/§4.5 lean on `test-writer` for the RED step — confirm `tdd` absorbs that responsibility so the red-first discipline still has an owner.
-A: Did it in skills map.
