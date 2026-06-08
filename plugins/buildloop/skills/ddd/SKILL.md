@@ -5,7 +5,7 @@ description: Phase ②: fill a build plan's WHAT (domain models, rules, services
 
 # /buildloop:ddd
 
-Guard the WHAT. Define the domain in the bp's `## WHAT — domain (DDD)` section. This skill owns the **DDD anti-assumption discipline**. Apply the writing principles (AGENTS.md §2).
+Guard the WHAT. Define the domain in the bp's `## WHAT — domain (DDD)` section. This skill owns the **DDD anti-assumption discipline**. Apply the writing principles (AGENTS.md §1).
 
 ## Anti-assumption discipline
 

@@ -5,7 +5,7 @@ description: Append a row to a buildloop doc's ## Log table (the single source o
 
 # /buildloop:log
 
-The **single writer** of the `## Log` table. That table is the only source of truth for "where are we"; there is no `Status:` field. Apply the log-table state model (AGENTS.md §1.2); do not restate it.
+The **single writer** of the `## Log` table. That table is the only source of truth for "where are we"; there is no `Status:` field. Apply the log-table state model (AGENTS.md §2.2); do not restate it.
 
 Two row kinds, fixed four columns `when | who | phase → | what`:
 

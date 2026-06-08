@@ -5,7 +5,7 @@ description: Phase ④: judge a shipped feature's hypotheses against live prod d
 
 # /buildloop:measure
 
-Judge the bet. Compare the launched cohort's live metrics to the thresholds set in `interview-me`, and decide rollout. This closes the hypothesis loop (AGENTS.md §1.8). Apply the writing principles (§2).
+Judge the bet. Compare the launched cohort's live metrics to the thresholds set in `interview-me`, and decide rollout. This closes the hypothesis loop (AGENTS.md §2.8). Apply the writing principles (§1).
 
 ## Precondition
 
@@ -14,7 +14,7 @@ A `feature-document.md` with **Hypotheses & metrics** defined and a released coh
 ## Steps
 
 1. Read the feature-document's **Hypotheses & metrics** (thresholds) and **Release** (cohort).
-2. Read the cohort's **live prod data** from the telemetry sink and compare each metric to its threshold. [PROJECT: name the dashboard / query / metrics store, per §1.8.]
+2. Read the cohort's **live prod data** from the telemetry sink and compare each metric to its threshold. [PROJECT: name the dashboard / query / metrics store, per §2.8.]
 3. Record the **verdict** in the feature-document's metrics table, one of:
    - **yes**: threshold met. Flip the flag to **100%** (full rollout); set Release state = 100%. The feature is **Shipped**. Log a work row.
    - **not yet**: inconclusive. Hand off to `/buildloop:tweak-it` to improve, keeping the cohort as-is.
@@ -23,6 +23,6 @@ A `feature-document.md` with **Hypotheses & metrics** defined and a released coh
 
 ## Notes
 
-- The chain that feeds this: metric and threshold defined in ① (fc), instrumented in ③ (tdd), released to a cohort in ④ (ship-in-prd), judged here in ④ (§1.8).
+- The chain that feeds this: metric and threshold defined in ① (fc), instrumented in ③ (tdd), released to a cohort in ④ (ship-in-prd), judged here in ④ (§2.8).
 - Rollout and rollback are flag flips, not redeploys (the deploy ≠ release seam `ship-in-prd` owns).
 - Standalone: refuses if the feature-document defines no metrics.

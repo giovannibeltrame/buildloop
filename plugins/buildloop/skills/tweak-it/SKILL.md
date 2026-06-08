@@ -5,7 +5,7 @@ description: Phase ④: change a shipped feature (bugfix or improvement) and rou
 
 # /buildloop:tweak-it
 
-Route a change to a shipped feature back into the loop at the cheapest correct depth. Where you re-enter *is* the lite/full decision. Apply the writing principles (AGENTS.md §2).
+Route a change to a shipped feature back into the loop at the cheapest correct depth. Where you re-enter *is* the lite/full decision. Apply the writing principles (AGENTS.md §1).
 
 ## Precondition
 

@@ -5,7 +5,7 @@ description: Phase ④: ship a build-gated feature: distill its fc + bp into a l
 
 # /buildloop:ship-in-prd
 
-Ship the feature. Distill the working docs into the living one, then deploy and release as separate acts. This skill owns the **deploy ≠ release** seam. Apply the writing principles (AGENTS.md §2).
+Ship the feature. Distill the working docs into the living one, then deploy and release as separate acts. This skill owns the **deploy ≠ release** seam. Apply the writing principles (AGENTS.md §1).
 
 ## Deploy ≠ release
 
@@ -25,8 +25,8 @@ Keep the two apart; that separation is what makes rollout and rollback cheap.
    - What changed, and which kind of change? → the CHANGELOG line.
    - Which behaviors or rules must keep working? → the e2e-guarded invariants.
    - Which strict technical facts must a maintainer know? → technical notes.
-2. **Write the living feature-document** (§1.5). For a new feature, copy `templates/feature-document.md` to `docs/buildloop/living/<feature-name>.md`; for a re-ship (from `tweak-it`), update the existing one. Distill from the fc and bp:
-   - **Hypotheses & metrics**: copied from the fc so `measure` can read them (the telemetry seam, §1.8).
+2. **Write the living feature-document** (§2.5). For a new feature, copy `templates/feature-document.md` to `docs/buildloop/living/<feature-name>.md`; for a re-ship (from `tweak-it`), update the existing one. Distill from the fc and bp:
+   - **Hypotheses & metrics**: copied from the fc so `measure` can read them (the telemetry seam, §2.8).
    - **Invariants (e2e-guarded)**: each naming the e2e test that guards it.
    - **Release**: the flag name and launch cohort.
    - **Technical notes.**

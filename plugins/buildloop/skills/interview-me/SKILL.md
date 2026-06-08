@@ -5,7 +5,7 @@ description: Entry skill for phase ① (Re)Think it: interview the user to produ
 
 # /buildloop:interview-me
 
-Open phase ① by turning an idea into a feature candidate. Guard the WHAT with the anti-assumption discipline the `ddd` skill owns: never guess, always ask. Apply the writing principles (AGENTS.md §2); do not restate any rule.
+Open phase ① by turning an idea into a feature candidate. Guard the WHAT with the anti-assumption discipline the `ddd` skill owns: never guess, always ask. Apply the writing principles (AGENTS.md §1); do not restate any rule.
 
 ## Steps
 
@@ -13,12 +13,12 @@ Open phase ① by turning an idea into a feature candidate. Guard the WHAT with 
    ```
    buildloop next-id fc
    ```
-   Copy the plugin's `templates/fc-xxxx.md` to `docs/buildloop/working/fc-NNNN.md` (the doc map, §1.5).
+   Copy the plugin's `templates/fc-xxxx.md` to `docs/buildloop/working/fc-NNNN.md` (the doc map, §2.5).
 2. **Run the questions loop**, one question per ambiguity. Read the project's product docs the idea touches first, if the project keeps any. Fill the fc sections:
    - **Why**: WHAT you want to build and WHY. State the problem worth solving, not a restatement of the headline.
    - **Narrative**: what makes it lovable.
    - **Hypotheses**: the falsifiable claims the feature bets on.
-   - **Metrics**: for each hypothesis, the metric, its success threshold, and the app **event/counter** that emits it (the telemetry seam, §1.8). Naming it here is what lets `measure` judge it later.
+   - **Metrics**: for each hypothesis, the metric, its success threshold, and the app **event/counter** that emits it (the telemetry seam, §2.8). Naming it here is what lets `measure` judge it later.
 3. **Write the first log row** (the template ships an empty table):
    ```
    buildloop log docs/buildloop/working/fc-NNNN.md interview-me "created" --to "① (Re)Think it"

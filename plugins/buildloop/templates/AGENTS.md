@@ -2,7 +2,7 @@
 BuildLoop operating manual (TEMPLATE).
 
 Drop this file at your repository root as `AGENTS.md`. The buildloop plugin's
-skills and agents reference this file by section number (e.g. "AGENTS.md §1.4"),
+skills and agents reference this file by section number (e.g. "AGENTS.md §2.4"),
 so keep the section numbering intact when you edit.
 
 Scope: this file is the project-agnostic buildloop methodology: the phase/loop
@@ -17,13 +17,21 @@ owners; it does not restate them.
 
 # Agent Instructions
 
-This file is the canonical operating manual for the buildloop workflow. It is tool-agnostic; every agent, skill, and human contributor reads from here. `CLAUDE.md` at the root is a thin pointer to this file plus the few non-negotiables that must always load.
+## 1. Writing principles: DRY, KISS, YAGNI
 
-## 1. The build loop
+These apply to every text surface, for AI agents and humans alike: buildloop docs, code comments, test names, commit messages, PR bodies, and agent self-checks.
+
+- **DRY**: concise sentences. No redundancy, no over-explaining.
+- **KISS**: simple solutions. Small, targeted changes that are easy to review.
+- **YAGNI**: build only what today's task asks for. Preserve existing behavior unless the task is a behavior change. No broad refactors during localized fixes.
+
+The think-gate and plan-gate enforce concrete style checks in their rubrics. Humans judge the rest.
+
+## 2. The build loop
 
 (Re)Think it → Plan it → Build it → Ship it. Loop again.
 
-### 1.1 Phases and gates
+### 2.1 Phases and gates
 
 ```mermaid
 flowchart LR
@@ -49,7 +57,7 @@ flowchart LR
 - **New idea / problem** enters at ① via `interview-me`.
 - **Change to a shipped feature** enters via `tweak-it`, which re-enters the loop at ② (lite) or ① (full).
 
-### 1.2 State lives in the log table
+### 2.2 State lives in the log table
 
 There is no `Status:` field. Each doc carries a `## Log` table that is the single source of truth for "where are we."
 
@@ -59,7 +67,7 @@ There is no `Status:` field. Each doc carries a `## Log` table that is the singl
 - **No top-of-doc cache.** Derive the phase from the log; `buildloop current-phase <doc>` does this deterministically.
 - **Canonical phase tokens**: `① (Re)Think it · ② Plan it · ③ Build it · ④ Ship it`.
 
-### 1.3 The phases
+### 2.3 The phases
 
 Each phase names the skills that run in it and the artifact it produces. Skills carry their own method rules; this section is the WHAT and WHY.
 
@@ -70,7 +78,7 @@ Each phase names the skills that run in it and the artifact it produces. Skills 
 | **③ Build it** | `tdd` (red → green → refactor) → `build-gate` | tests + code |
 | **④ Ship it** | `ship-in-prd` (deploy + release) → `measure` (hypothesis verdict) → `tweak-it` (bugfix / improvement) | `feature-document.md` + `CHANGELOG.md` |
 
-### 1.4 Gates
+### 2.4 Gates
 
 A gate is a **read-only verdict function of doc state**, never of which skill ran. Because it depends only on artifacts-present-and-valid and never writes, it works the same whether spawned by the advancing skill or invoked standalone (`/<gate> <doc>`); on pass, the write of the transition row is always the separate step owned by whoever advances.
 
@@ -84,7 +92,7 @@ A gate is a **read-only verdict function of doc state**, never of which skill ra
 
 **Build-gate bounce** routes a failure to the phase that owns the defect: implementation wrong → ③ (`tdd`); scenario mis-modeled → ② (`build-plan`); premise wrong → ① (`interview-me`).
 
-### 1.5 Doc kinds and lifecycle
+### 2.5 Doc kinds and lifecycle
 
 | Doc | Kind | Path | Role |
 |---|---|---|---|
@@ -97,7 +105,7 @@ A gate is a **read-only verdict function of doc state**, never of which skill ra
 - **feature-document.md is the living doc.** `ship-in-prd` distills the fc + bp hypotheses, metrics, and invariants into it, so `measure` has something to read. It keeps only its **last transition**; change history goes to `CHANGELOG.md`.
 - **No constants doc.** Invariants the system must uphold are declared in a feature-document's **"Invariants (e2e-guarded)"** section and guarded by e2e tests.
 
-### 1.6 Skill contracts
+### 2.6 Skill contracts
 
 Each skill declares **Requires (state) / Produces / Standalone fallback**. *Requires* is a precondition on state (artifact present + phase read from the log), never "skill X ran first." Skills sequence themselves because one skill's Requires is another's Produces; neither names the other.
 
@@ -118,16 +126,16 @@ Each skill declares **Requires (state) / Produces / Standalone fallback**. *Requ
 | `log` | a doc (creates the `## Log` table if missing) | appended row (work or transition) | creates the table |
 
 **Two Requires that nothing else Produces (external inputs, by design):**
-- `measure` needs **live prod data**, from telemetry on the shipped cohort, not any doc (§1.8).
+- `measure` needs **live prod data**, from telemetry on the shipped cohort, not any doc (§2.8).
 - `ship-in-prd` needs the **deploy + feature-flag** mechanism: infra, not a skill output (owned by the `ship-in-prd` skill).
 
 Everything else chains: an upstream Produces satisfies each Requires.
 
-### 1.7 Auto-suggest at triage
+### 2.7 Auto-suggest at triage
 
 When a user message describes building, fixing, or changing something, Claude proposes the entry skill before writing code: `interview-me` for a new idea, `tweak-it` for a change to a shipped feature. User confirms or redirects. No auto-firing; the explicit skill invocation is always available. Questions, exploration, and discussion do not trigger the suggestion.
 
-### 1.8 Telemetry seam
+### 2.8 Telemetry seam
 
 The hypothesis loop closes only if a metric defined up front is the same one judged at the end. `measure` needs live prod data, which no skill produces; this chain supplies it:
 
@@ -139,19 +147,7 @@ The hypothesis loop closes only if a metric defined up front is the same one jud
 
 Defined in ①, instrumented in ③, released to a cohort in ④, judged in ④.
 
-## 2. Writing principles: DRY, KISS, YAGNI
-
-These apply to every text surface, for AI agents and humans alike: buildloop docs, code comments, test names, commit messages, PR bodies, and agent self-checks.
-
-- **DRY**: concise sentences. No redundancy, no over-explaining.
-- **KISS**: simple solutions. Small, targeted changes that are easy to review.
-- **YAGNI**: build only what today's task asks for. Preserve existing behavior unless the task is a behavior change. No broad refactors during localized fixes.
-
-The think-gate and plan-gate enforce concrete style checks in their rubrics. Humans judge the rest.
-
-## 3. Skills and agents
-
-### 3.1 Namespace
+### 2.9 Skills and agents namespace
 
 BuildLoop skills use the `buildloop:` namespace: `/buildloop:interview-me`, `make-prototypes`, `does-it-worth`, `build-plan`, `ddd`, `bdd`, `tdd`, `build-gate`, `ship-in-prd`, `measure`, `tweak-it`, `log`.
 

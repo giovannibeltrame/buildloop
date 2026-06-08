@@ -5,7 +5,7 @@ description: Phase ③ exit gate: a thin orchestrator that runs the 8-step build
 
 # /buildloop:build-gate
 
-Drive the build-gate (AGENTS.md §1.4). This skill owns the 8-step sequence below; run it in order, advance the bp ③ → ④ on pass, and hand to ship. It is an orchestrator skill rather than an agent because the sequence mixes agents, skills, and human steps. Apply the rules by reference.
+Drive the build-gate (AGENTS.md §2.4). This skill owns the 8-step sequence below; run it in order, advance the bp ③ → ④ on pass, and hand to ship. It is an orchestrator skill rather than an agent because the sequence mixes agents, skills, and human steps. Apply the rules by reference.
 
 ## Precondition
 
@@ -25,7 +25,7 @@ Steps 1–6 are automated. The human steps follow:
 7. **PR review**: open the PR (the project's PR template, if any) and request human review.
 8. **UAT**: a human stakeholder confirms the behavior in the real system.
 
-## Bounce on failure (§1.4)
+## Bounce on failure (§2.4)
 
 Route a failure to the phase that owns the defect, then stop:
 
