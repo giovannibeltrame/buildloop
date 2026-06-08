@@ -22,7 +22,7 @@ Drive the build-gate (AGENTS.md §1.4). This skill owns the 8-step sequence belo
 
 Steps 1–6 are automated. Then the human steps:
 
-7. **PR review** — open the PR (§3.2) at this point and request human review.
+7. **PR review** — open the PR (per the project's PR template, if any) at this point and request human review.
 8. **UAT** — human stakeholder confirms the behavior in the real system.
 
 ## Bounce on failure (§1.4)

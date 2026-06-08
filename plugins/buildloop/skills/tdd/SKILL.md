@@ -15,7 +15,7 @@ The bp must be past the plan-gate: `buildloop current-phase <bp>` reads `③ Bui
 
 Tackle the bp's HOW scenarios **sequentially**; one test at a time. One scenario unfolds into N tests — each correctness condition is its own assertion. For each test:
 
-1. **Write the failing test yourself** — no separate test-writer; `tdd` owns RED. Run it. Observe **RED**, failing for the right reason, not a setup/import error. Commit with a `RED —` tag (§3.1, doc-id `bp-NNNN`).
+1. **Write the failing test yourself** — no separate test-writer; `tdd` owns RED. Run it. Observe **RED**, failing for the right reason, not a setup/import error. Commit with a `RED —` tag (doc-id `bp-NNNN`). The `RED —` / `GREEN —` / `refactor —` commit-tag convention is this skill's — `code-checker` audits red-first discipline by greping for it.
 2. Write the **minimum** code to flip **GREEN**. Nothing more. Commit with a `GREEN —` tag.
 3. **Refactor** with all prior tests green. Commit with a `refactor —` tag if anything changed.
 

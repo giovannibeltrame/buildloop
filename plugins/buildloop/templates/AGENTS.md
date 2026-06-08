@@ -149,68 +149,9 @@ Apply to every text surface — AI agents and humans alike, in buildloop docs, c
 
 The think-gate and plan-gate enforce concrete style checks in their rubrics. Humans judge the rest.
 
-## 3. Commits, PRs, sequence numbers
+## 3. Skills and agents
 
-### 3.1 Commit message format
-
-```
-(<doc-id>): <short imperative description>
-```
-
-- ≤ 70 chars on the header line.
-- `<doc-id>` ∈ `fc-NNNN` / `bp-NNNN`.
-- Body optional (1–3 sentences on *why*).
-- **Footer required on phase transitions**:
-  ```
-  Log: <doc-id> <From> → <To>
-  ```
-- **TDD cycle commits** inside phase ③ carry explicit tags in the description (`RED —` / `GREEN —` / `refactor —`); `code-checker` audits the discipline. The tag rule lives in the `tdd` skill.
-
-**Doc-less commit exceptions**:
-- Commits touching only files with no product behavior (config, manifests, generated files, ops/deploy config, thin CLI shims).
-- Commits touching only README or non-buildloop docs.
-
-### 3.2 PR template
-
-Lives at `.github/PULL_REQUEST_TEMPLATE.md`. Body:
-
-```markdown
-## Doc
-- Plan: [bp-NNNN](docs/buildloop/working/bp-NNNN.md)
-- Candidate: [fc-NNNN](docs/buildloop/working/fc-NNNN.md)
-
-## Summary
-<one paragraph: what changes from the user/system perspective>
-
-## BDD scenarios delivered
-- <scenario name 1>
-- <scenario name 2>
-
-## Log entry
-Transition: <From> → <To>  (or "no transition; intra-phase work")
-See `bp-NNNN.md` § Log → newest row.
-
-## Quality gates
-- [ ] `/simplify` clean
-- [ ] `code-checker` clean
-- [ ] `/code-review` clean
-- [ ] `/security-review` clean
-- [ ] `ux-checker` clean (or N/A — diff doesn't touch UI)
-- [ ] `/verify` UAT pass (or pending — PR opens at build-gate, UAT happens before ④)
-
-## Test plan for reviewer
-- [ ] <thing for the human reviewer to verify>
-```
-
-**Lifecycle**: the PR opens when `build-gate` starts (handing off to automated review) with the UAT box unchecked. UAT happens on the PR branch. UAT pass + all boxes checked = merge = phase ④.
-
-### 3.3 Sequence number scheme
-
-`NNNN` = 4 digits, zero-padded, per kind (`fc-0001…`, `bp-0001…`). `buildloop next-id <fc|bp>` issues the next, reserving archived numbers. Expanding to 5 digits is a clean future change if a kind approaches 9999.
-
-## 4. Skills and agents
-
-### 4.1 Namespace
+### 3.1 Namespace
 
 BuildLoop skills use the `buildloop:` namespace: `/buildloop:interview-me`, `make-prototypes`, `does-it-worth`, `build-plan`, `ddd`, `bdd`, `tdd`, `build-gate`, `ship-in-prd`, `measure`, `tweak-it`, `log`.
 

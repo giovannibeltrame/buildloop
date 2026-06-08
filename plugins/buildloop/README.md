@@ -8,7 +8,7 @@ Four phases, three gates between them, and a log table — not a status field �
 
 It ships three layers:
 
-- **Declarative** — an `AGENTS.md` operating manual (provided as a template) holding the cross-cutting rules: project context, the phase/loop map, and the gate contracts.
+- **Declarative** — an `AGENTS.md` operating manual (provided as a template) holding the project-agnostic buildloop methodology: the phase/loop map, the gate contracts, and the writing principles.
 - **Enforcement** — twelve skills that drive the four phases (each owns its method rule: BDD → bdd, TDD → tdd, DDD → ddd, …).
 - **Auditing** — four review agents (each gate agent owns its pass-criteria).
 
@@ -65,7 +65,7 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
    docs/buildloop/{working,working/archive,living}/
    ```
    (`CHANGELOG.md` lives at the repo root.)
-4. **Add your project-specific gate agents** (optional). The plugin ships the generic `code-checker`, `think-gate`, `plan-gate`, and `ux-checker`. If your stack needs more (e.g. a `security-reviewer`), add it under `.claude/agents/` and name it in `AGENTS.md §4.1`.
+4. **Add your project-specific gate agents** (optional). The plugin ships the generic `code-checker`, `think-gate`, `plan-gate`, and `ux-checker`. If your stack needs more (e.g. a `security-reviewer`), add it under `.claude/agents/` and name it in `AGENTS.md §3.1`.
 
 ## The loop at a glance
 

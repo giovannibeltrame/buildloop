@@ -34,7 +34,7 @@ The two are separate acts, and keeping them separate is what makes rollout and r
    ```
    buildloop log docs/buildloop/living/<feature-name>.md ship-in-prd "shipped to launch cohort" --to "④ Ship it"
    ```
-3. **Prepend a CHANGELOG.md entry** (repo root) — WHO changed WHAT, ≤280 chars, linked to the fc (§3.1).
+3. **Prepend a CHANGELOG.md entry** (repo root) — WHO changed WHAT, ≤280 chars, linked to the fc.
 4. **Deploy, then release** per the seam above: merge → main triggers CI/CD; set the flag to the launch cohort.
 5. **Archive the working docs.** Move the fc and bp to `docs/buildloop/working/archive/` (their numbers stay reserved). The living feature-document is now the source of truth.
 6. Hand off to `/buildloop:measure` once the cohort accrues live data.

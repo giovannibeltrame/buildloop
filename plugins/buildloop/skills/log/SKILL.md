@@ -26,7 +26,7 @@ Two row kinds, fixed four columns `when | who | phase → | what`:
      buildloop log <doc-path> "<who>" "<what>" --to "<② Plan it>"
      ```
    Phase tokens are canonical: `① (Re)Think it · ② Plan it · ③ Build it · ④ Ship it`.
-3. On a transition, surface the commit footer for whoever commits it (AGENTS.md §3.1):
+3. On a transition, surface buildloop's transition-commit footer for whoever commits it (this footer convention is owned here; it mirrors the log row into git history):
    ```
    Log: <doc-id> <From> → <To>
    ```

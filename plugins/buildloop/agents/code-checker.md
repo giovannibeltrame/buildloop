@@ -37,7 +37,7 @@ Report the decision with a one-line justification per new file. If genuinely amb
 
 ## TDD-discipline audit
 
-Audit the red-first discipline the `tdd` skill owns, against the commit format in §3.1: grep the change's commits for `RED —` / `GREEN —` tags and flag unpaired RED entries. For a log-declared characterization fix (the `tdd` exemption), look instead for the coverage-gate red→green plus a recorded mutation spot-check. Confirm every phase transition has a matching `## Log` row (§1.2).
+Audit the red-first discipline the `tdd` skill owns, against the `RED —` / `GREEN —` commit-tag convention that skill defines: grep the change's commits for the tags and flag unpaired RED entries. For a log-declared characterization fix (the `tdd` exemption), look instead for the coverage-gate red→green plus a recorded mutation spot-check. Confirm every phase transition has a matching `## Log` row (§1.2).
 
 ## What NOT to do
 
