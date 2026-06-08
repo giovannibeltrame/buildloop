@@ -25,7 +25,7 @@ change history lives in CHANGELOG.md.
 
 <behaviors the system must keep upholding; each names the e2e test that guards it>
 
-- <invariant>: `tests/e2e/<…>`
+- <invariant>: <the e2e test that guards it>
 
 ## Release
 

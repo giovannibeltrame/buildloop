@@ -28,7 +28,7 @@ Resist SOLID lectures, speculative refactors, and preferences ungrounded in proj
 
 ## Coverage classification (you own this)
 
-Coverage policy is the project's to set (buildloop projects typically gate product code to 100% line coverage). When the diff adds a **new source file** under a monitored root, your call is binary:
+Coverage policy is the project's to set; your job is the classification, so the project can hold each new file to whatever bar it sets. When the diff adds a **new source file** under a monitored root, your call is binary:
 
 - **Product**, the default: any code that carries behavior. It must meet the project's coverage bar; if it can't yet, it needs a tracked follow-up (a `tweak-it` fix), never silent under-coverage.
 - **Non-product**: process entries / thin CLI shims, framework config, generated files, and whatever the project's non-product list (if it maintains one) names. Decide by the definition, then record the path with a one-line justification.

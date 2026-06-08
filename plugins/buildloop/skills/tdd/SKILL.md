@@ -26,7 +26,7 @@ Locks:
 
 Place each test in the layer matching its scenario tag (`[unit | integration | e2e]`), following the project's own test layout and naming convention. Where a bdd row pins "emits metric X", instrument it now so the metric ships with the feature (the telemetry seam, §1.8).
 
-**Characterization exemption.** A pure coverage-backfill of *existing, unmodified* production code cannot observe a meaningful RED. It is exempt from the per-test loop only when **no production code changes**, and must instead: (1) declare itself in the log; (2) drive the real red→green at the coverage-gate level (the file moves `<100%` to `100%`); (3) prove each test bites via a mutation spot-check (break the line, confirm the test fails, revert).
+**Characterization exemption.** A pure coverage-backfill of *existing, unmodified* production code cannot observe a meaningful RED. It is exempt from the per-test loop only when **no production code changes**, and must instead: (1) declare itself in the log; (2) drive the real red→green at the coverage-gate level (the file moves from under the project's coverage bar to meeting it); (3) prove each test bites via a mutation spot-check (break the line, confirm the test fails, revert).
 
 ## Hand-off
 

@@ -11,8 +11,8 @@ Ship the feature. Distill the working docs into the living one, then deploy and 
 
 Keep the two apart; that separation is what makes rollout and rollback cheap.
 
-- **Deploy** (artifact reaches the box): CI/CD, all-or-nothing. [PROJECT: name the pipeline, e.g. GitHub Actions on merge → main: build, deliver to the host, restart via systemd / docker compose. The code is on the box or it isn't.]
-- **Release** (who sees it): a feature flag or cohort gate in the app, not infra. Set the flag to a small launch cohort and record the flag name and cohort in the feature-document. [PROJECT: name the flag mechanism. A single host can't split traffic without an LB and target groups, so that stays YAGNI until a flag stops being enough.]
+- **Deploy** (the artifact reaches its runtime): all-or-nothing; the code is live or it isn't. [PROJECT: name your deploy pipeline.]
+- **Release** (who sees it): a feature flag or cohort gate in the app, not infra. Set the flag to a small launch cohort and record the flag name and cohort in the feature-document. [PROJECT: name your flag mechanism.]
 - Full rollout (`measure` = yes) flips the flag to **100%**. Rollback flips it to **0%**, no redeploy.
 
 ## Precondition
@@ -27,7 +27,7 @@ Keep the two apart; that separation is what makes rollout and rollback cheap.
    - Which strict technical facts must a maintainer know? → technical notes.
 2. **Write the living feature-document** (§1.5). For a new feature, copy `templates/feature-document.md` to `docs/buildloop/living/<feature-name>.md`; for a re-ship (from `tweak-it`), update the existing one. Distill from the fc and bp:
    - **Hypotheses & metrics**: copied from the fc so `measure` can read them (the telemetry seam, §1.8).
-   - **Invariants (e2e-guarded)**: each naming its `tests/e2e/` test.
+   - **Invariants (e2e-guarded)**: each naming the e2e test that guards it.
    - **Release**: the flag name and launch cohort.
    - **Technical notes.**
    Write its log row (the living doc keeps only its **last** transition, so on a re-ship delete the prior transition row first):
@@ -35,7 +35,7 @@ Keep the two apart; that separation is what makes rollout and rollback cheap.
    buildloop log docs/buildloop/living/<feature-name>.md ship-in-prd "shipped to launch cohort" --to "④ Ship it"
    ```
 3. **Prepend a CHANGELOG.md entry** (repo root): WHO changed WHAT, ≤280 chars, linked to the fc.
-4. **Deploy, then release** per the seam above: merge → main triggers CI/CD; set the flag to the launch cohort.
+4. **Deploy, then release** per the seam above: ship the artifact through the deploy pipeline, then set the flag to the launch cohort.
 5. **Archive the working docs.** Move the fc and bp to `docs/buildloop/working/archive/` (their numbers stay reserved). The living feature-document is now the source of truth.
 6. Hand off to `/buildloop:measure` once the cohort accrues live data.
 
