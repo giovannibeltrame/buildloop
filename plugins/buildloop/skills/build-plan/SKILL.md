@@ -5,7 +5,7 @@ description: Phase ② orchestrator — create a build plan (bp) from a feature 
 
 # /buildloop:build-plan
 
-Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decomposition into one `bp-NNNN.md`, then gate it. Apply the writing principles ([AGENTS.md §4.7](AGENTS.md)).
+Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decomposition into one `bp-NNNN.md`, then gate it. Apply the writing principles ([AGENTS.md §4.4](AGENTS.md)).
 
 ## Steps
 
@@ -17,12 +17,12 @@ Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decompo
 3. **Fill it** by sub-invoking, in order:
    - `/buildloop:ddd` → WHAT + Ubiquitous Language.
    - `/buildloop:bdd` → HOW (acceptance scenarios table).
-   - the **`plan` agent** → phases/steps/tasks, critical files, trade-offs. Unfold every task to its minimum (§6.3 criterion 3).
+   - the **`plan` agent** → phases/steps/tasks, critical files, trade-offs. Unfold every task to its minimum (the plan-gate's decomposition criterion).
 4. **Check open questions** (`ddd` may have raised some):
    ```
    buildloop open-questions docs/buildloop/working/bp-NNNN.md
    ```
-   If `open-questions`, stop — resolve them before gating (§4.6).
+   If `open-questions`, stop — resolve them before gating (the anti-assumption discipline `ddd` owns).
 5. **Gate and advance.** Invoke the `plan-gate` agent on the bp.
    - **Pass** → `buildloop log <bp> "plan-gate · build-plan advances" "gate passed" --to "③ Build it"`, then hand off to `/buildloop:tdd`.
    - **Fail** → address the gap list, re-run. Gates never write; the advancing skill does (§3.4).

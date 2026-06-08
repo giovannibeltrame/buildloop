@@ -5,15 +5,15 @@ description: Phase ③ exit gate — a thin orchestrator that runs the 8-step bu
 
 # /buildloop:build-gate
 
-Drive the build-gate. Run the 8-step sequence in [AGENTS.md §3.8](AGENTS.md), in order; on pass advance the bp ③ → ④ and hand to ship. This is an orchestrator skill (not an agent) because the sequence mixes agents, skills, and human steps. Apply the rules by reference.
+Drive the build-gate ([AGENTS.md §3.4](AGENTS.md)). This skill owns the 8-step sequence below — run it in order; on pass advance the bp ③ → ④ and hand to ship. It is an orchestrator skill (not an agent) because the sequence mixes agents, skills, and human steps. Apply the rules by reference.
 
 ## Precondition
 
 `buildloop current-phase <bp>` reads `③ Build it`.
 
-## Sequence (§3.8) — run in order, stop on the first real failure
+## Sequence — run in order, stop on the first real failure
 
-1. **`ux-checker`** agent — only if the diff touches UI ([§4.8](AGENTS.md)); skip otherwise.
+1. **`ux-checker`** agent — only if the diff touches UI (the `ux-checker` agent owns the routing); skip otherwise.
 2. **`/simplify`** — apply quality cleanups.
 3. **`code-checker`** agent — clarity, complexity, coverage classification, TDD-discipline audit.
 4. **`/code-review`** — correctness + reuse findings.
@@ -39,7 +39,7 @@ All 8 steps clean (UAT signed off) →
 ```
 buildloop log <bp> "build-gate advances" "8-step sequence + UAT clean" --to "④ Ship it"
 ```
-then hand off to `/buildloop:ship-in-prd`. The PR merge that triggers deploy is ship's act (§4.9), not this gate's.
+then hand off to `/buildloop:ship-in-prd`. The PR merge that triggers deploy is ship's act (owned by `ship-in-prd`), not this gate's.
 
 ## Notes
 

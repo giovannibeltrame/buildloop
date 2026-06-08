@@ -5,7 +5,7 @@ description: Phase ① — produce lo-fi UX prototypes for a feature candidate (
 
 # /buildloop:make-prototypes
 
-Make the candidate tangible. Produce lo-fi prototypes in the fc's `## Prototypes` section so `does-it-worth` can judge them. Apply the writing principles ([AGENTS.md §4.7](AGENTS.md)); keep it cheap and disposable.
+Make the candidate tangible. Produce lo-fi prototypes in the fc's `## Prototypes` section so `does-it-worth` can judge them. Apply the writing principles ([AGENTS.md §4.4](AGENTS.md)); keep it cheap and disposable.
 
 ## Steps
 
@@ -20,5 +20,5 @@ Make the candidate tangible. Produce lo-fi prototypes in the fc's `## Prototypes
 
 ## Notes
 
-- Lo-fi by design — prototypes are throwaway thinking aids, not implementation. Real UX validation is `ux-checker` at the build-gate (§4.8).
+- Lo-fi by design — prototypes are throwaway thinking aids, not implementation. Real UX validation is the `ux-checker` agent at the build-gate.
 - Standalone: requires an fc; asks for or stubs one if missing.
