@@ -41,6 +41,7 @@ Candidate: fc-NNNN
 
 ## Log
 
+<!-- interview-me writes the first row: buildloop log <doc> interview-me "created" --to "① (Re)Think it" -->
+
 | when | who | phase → | what |
 |---|---|---|---|
-| <YYYY-MM-DD HH:MM> | interview-me | → ① (Re)Think it | created |

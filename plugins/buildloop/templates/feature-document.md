@@ -40,7 +40,7 @@ change history lives in CHANGELOG.md.
 ## Log
 
 <last transition only — change history lives in CHANGELOG.md>
+<!-- ship-in-prd writes the row: buildloop log <doc> ship-in-prd "shipped to launch cohort" --to "④ Ship it" -->
 
 | when | who | phase → | what |
 |---|---|---|---|
-| <YYYY-MM-DD HH:MM> | ship-in-prd | ③ Build it → ④ Ship it | shipped to launch cohort |

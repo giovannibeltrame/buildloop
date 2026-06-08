@@ -55,6 +55,7 @@ one Given/When/Then each (no And/But), mandatory layer tag. Each row = one test.
 
 ## Log
 
+<!-- build-plan writes the first row: buildloop log <doc> build-plan "created from fc-NNNN" --to "② Plan it" -->
+
 | when | who | phase → | what |
 |---|---|---|---|
-| <YYYY-MM-DD HH:MM> | build-plan | → ② Plan it | created from fc-NNNN |
