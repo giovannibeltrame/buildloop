@@ -7,7 +7,7 @@ Simplicity is key. Less complexity means more tokens for being used.
 
 ## Workflow
 
-Discover. Refine. Code. Test. Implement. Loop again 🔄
+(Re)Think it. Plan it. Build it. Ship it. Loop again 🔄
 
 ## Core principles, alphabet soup
 
@@ -33,7 +33,7 @@ Discover. Refine. Code. Test. Implement. Loop again 🔄
 
 BuildLoop is a **Claude Code plugin marketplace**. It currently ships one plugin:
 
-- **[`buildloop`](plugins/buildloop/)** — the loop above, made operational: six skills that drive a status flow (refine → plan → implement → review → UAT), three review agents (code-checker, doc-validator, test-writer), a zero-dependency `buildloop` helper, and an `AGENTS.md` operating-manual template you adapt to your repo.
+- **[`buildloop`](plugins/buildloop/)** — the loop above, made operational: twelve skills that drive four phases (①→②→③→④) through three gates, four review agents (think-gate, plan-gate, code-checker, ux-checker), a zero-dependency `buildloop` helper, and an `AGENTS.md` operating-manual template you adapt to your repo. State lives in each doc's `## Log` table, not a status field.
 
 ```
 .claude-plugin/marketplace.json   ← marketplace manifest
@@ -64,4 +64,4 @@ Or commit it so everyone who clones the project gets it automatically — add to
 }
 ```
 
-Then follow the plugin's [adoption guide](plugins/buildloop/README.md): drop `templates/AGENTS.md` at your repo root, create `docs/buildloop/{epics,bugfixes,hypotheses,constants}/`, and fill in the `[PROJECT: …]` notes.
+Then follow the plugin's [adoption guide](plugins/buildloop/README.md): drop `templates/AGENTS.md` at your repo root, create `docs/buildloop/{working,working/archive,living}/` (and a root `CHANGELOG.md`), and fill in the `[PROJECT: …]` notes.

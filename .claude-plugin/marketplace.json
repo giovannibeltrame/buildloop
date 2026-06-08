@@ -15,7 +15,7 @@
         "sha": "0df857bf6734dafa234125aeffc548d0c4f28017"
       },
       "version": "0.1.0",
-      "description": "Discover → Refine → Code → Test → Implement loop: a status-flow workflow with TDD, BDD, DDD and quality gates, operationalized as skills + review agents."
+      "description": "(Re)Think it → Plan it → Build it → Ship it: a four-phase loop with TDD, BDD, DDD, log-table state and quality gates, operationalized as skills + review agents."
     }
   ]
 }
