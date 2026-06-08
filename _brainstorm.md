@@ -277,3 +277,55 @@ flowchart TD
     - Full vs lite = **where you re-enter the loop**:
         - LITE → re-enters at Plan it (thin build-plan; WHY/narrative unchanged)
         - FULL → re-enters at (Re)Think it (premise/scope moved; re-interview → re-worth → full build-plan)
+
+## Implementation plan
+
+This is a near-total rewrite of the shipped plugin. Today's repo runs the *old* model — 6 skills (`create-doc · ddd-refine · implement · log · audit · promote`), 3 agents (`code-checker · doc-validator · test-writer`), a numeric `Status:` 1–8 state field, and a `{epics,bugfixes,hypotheses,constants}` docs tree. The target above replaces all of that.
+
+**Ordering principle.** Build the contracts everything references first (M0), then deliver the loop one phase at a time (M1–M4) so each phase is walkable end-to-end before the next starts, then remove the old model and update the surfaces (M5–M6). M1–M4 each depend only on M0; within a milestone the gate agent depends on its skills. M5 can start once a phase's replacement lands; M6 is last.
+
+| # | Milestone | Delivers | Walkable when done |
+|---|---|---|---|
+| M0 | Foundations | AGENTS.md rewrite · log table · `bin/buildloop` · doc shapes | a hand-authored fc + bp validate; phase reads from the log |
+| M1 | ① (Re)Think it | interview-me · make-prototypes · does-it-worth · think-gate | idea → validated fc past ①→② |
+| M2 | ② Plan it | build-plan · ddd · bdd · plan-gate | fc → validated bp past ②→③ |
+| M3 | ③ Build it | tdd · code-checker · ux-checker · build-gate wiring | bp → green build-gate |
+| M4 | ④ Ship it | ship-in-prd · measure · tweak-it | green build → shipped feature-document + verdict |
+| M5 | Remove & migrate | drop audit · create-doc · test-writer · old doc kinds | no old-model references remain |
+| M6 | Surfaces | plugin README · root README · plugin.json · marketplace | docs match the new maps |
+
+### M0 — Foundations (do first)
+The single source of truth and the things every skill/agent calls. Nothing downstream is stable until these are.
+- **Rewrite `templates/AGENTS.md`** to this brainstorm: 4 phases ①–④; the log-table state model (drop the `Status:` field and the §4.8 status-sync hook); the three gate contracts; the skill-contracts table (Requires/Produces/Standalone); docs map + lifecycle; design rules; the build-gate 8-step sequence; the telemetry seam. Retarget every `§`-reference the skills cite.
+- **Upgrade the `log` skill to the table format** (two row kinds work/transition; append-only, single writer; current phase = the last `phase →`). Foundational because every gate transition appends through it.
+- **Update `bin/buildloop`**: id scheme → `fc-xxxx` / `bp-xxxx`; replace status-field reads with log-table append + phase derivation (`current-phase`, `next-id`, `open-questions`); drop the epic/fix/hyp/cnst id + `can-promote` logic.
+- **Define the doc shapes/templates**: `fc-xxxx` (WHY · narrative · hypotheses · metrics · prototypes · verdict), `bp-xxxx` (phases · WHAT/DDD · HOW/BDD · plan), `feature-document.md` (living, incl. "Invariants (e2e-guarded)"), `CHANGELOG.md`. Settle the docs directory layout + the archive-on-ship mechanism.
+
+### M1 — (Re)Think it ①
+- `interview-me` (new — WHY/narrative/hypotheses/metrics, creates the fc), `make-prototypes` (new — lo-fi), `does-it-worth` (new — yes/not-yet/park/never).
+- `think-gate` agent (new — fc complete + verdict = yes → emits ①→②).
+
+### M2 — Plan it ②
+- `build-plan` orchestrator (new — full/lite), `ddd` (rename from ddd-refine; scope to WHAT + ubiquitous language), `bdd` (new — acceptance + scenarios as a table); wire the built-in `plan` agent.
+- `plan-gate` agent (rename doc-validator, fold in simplify — validates bp → emits ②→③).
+
+### M3 — Build it ③
+- `tdd` (rename from implement; owns red→green→refactor and now owns RED, since test-writer is gone).
+- `code-checker` (simplify), `ux-checker` (new — optional, UI diffs).
+- Wire the build-gate's ordered 8-step sequence (ux · simplify · code-checker · code-review · security-review · verify · PR · UAT) and the three-way bounce (impl→③ · scenario→② · premise→①). Built-ins couple in directly (YAGNI) — no abstraction layer.
+
+### M4 — Ship it ④
+- `ship-in-prd` (repurpose promote — deploy≠release seam; writes feature-document + CHANGELOG; sets release flag + cohort).
+- `measure` (new — reads live prod data; yes/not-yet/invalidated), `tweak-it` (new — scope-trigger checklist; lite→② / full→①).
+
+### M5 — Remove & migrate
+- Delete the `audit` and `create-doc` skills and the `test-writer` agent. Remove the old doc kinds (epic/fix/hyp/cnst) and any lingering references. Retire/migrate the old docs tree.
+
+### M6 — Surfaces & docs
+- Update plugin `README.md`, root `README.md`, `plugin.json` description, and the marketplace manifest to the new skill/agent/doc maps and the 4-phase loop.
+
+### Open decisions to confirm before coding
+1. **Docs layout + archive.** Final directory shape for fc/bp + features, and how fc/bp are archived on ship.
+2. **Log-table parser.** How strict the markdown-table parsing in `bin/buildloop` must be (tolerant vs. fixed columns).
+3. **Build-gate runner.** Who drives the 8-step sequence — a thin orchestrator skill, or Claude in-thread — given steps 7–8 (PR · UAT) are human.
+4. **Gate agents standalone?** Whether think-gate / plan-gate are invocable on their own or only spawned by the advancing skill.
