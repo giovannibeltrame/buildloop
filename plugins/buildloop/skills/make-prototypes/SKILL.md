@@ -5,11 +5,11 @@ description: Phase ① — produce lo-fi UX prototypes for a feature candidate (
 
 # /buildloop:make-prototypes
 
-Make the candidate tangible. Produce lo-fi prototypes in the fc's `## Prototypes` section so `does-it-worth` can judge them. Apply the writing principles (AGENTS.md §3.4); keep it cheap and disposable.
+Make the candidate tangible. Produce lo-fi prototypes in the fc's `## Prototypes` section so `does-it-worth` can judge them. Apply the writing principles (AGENTS.md §2); keep it cheap and disposable.
 
 ## Steps
 
-1. Read the fc's Why / Narrative / Hypotheses (§2.5). If no fc exists, stub a minimal one or point the user at `/buildloop:interview-me`.
+1. Read the fc's Why / Narrative / Hypotheses (§1.5). If no fc exists, stub a minimal one or point the user at `/buildloop:interview-me`.
 2. Sketch **lo-fi** prototypes — ASCII wireframes, flow sketches, or short interaction outlines. One per genuinely distinct option; do not gold-plate (YAGNI). Each should convey the narrative, not the visual polish.
 3. Write them into the fc's `## Prototypes` section, labelled so a verdict can reference them.
 4. Record progress with a work row:

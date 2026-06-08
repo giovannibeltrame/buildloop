@@ -5,7 +5,7 @@ description: Phase ③ — drive a build plan's implementation with red → gree
 
 # /buildloop:tdd
 
-Own the build. This skill writes the failing test *and* the code, and is the **single source of truth for the project's TDD discipline** (`code-checker` audits against it). Apply the writing principles (AGENTS.md §3.4).
+Own the build. This skill writes the failing test *and* the code, and is the **single source of truth for the project's TDD discipline** (`code-checker` audits against it). Apply the writing principles (AGENTS.md §2).
 
 ## Precondition
 
@@ -15,7 +15,7 @@ The bp must be past the plan-gate: `buildloop current-phase <bp>` reads `③ Bui
 
 Tackle the bp's HOW scenarios **sequentially**; one test at a time. One scenario unfolds into N tests — each correctness condition is its own assertion. For each test:
 
-1. **Write the failing test yourself** — no separate test-writer; `tdd` owns RED. Run it. Observe **RED**, failing for the right reason, not a setup/import error. Commit with a `RED —` tag (§4.1, doc-id `bp-NNNN`).
+1. **Write the failing test yourself** — no separate test-writer; `tdd` owns RED. Run it. Observe **RED**, failing for the right reason, not a setup/import error. Commit with a `RED —` tag (§3.1, doc-id `bp-NNNN`).
 2. Write the **minimum** code to flip **GREEN**. Nothing more. Commit with a `GREEN —` tag.
 3. **Refactor** with all prior tests green. Commit with a `refactor —` tag if anything changed.
 
@@ -24,7 +24,7 @@ Locks:
 - **One test at a time.** The cycle is per individual test, not per scenario or file. Writing five tests then code that flips them all at once violates TDD even if end-state coverage is identical.
 - **Scenarios are tackled sequentially.** Tests never seen RED don't count.
 
-Place each test in the layer matching its scenario tag (§3.1) under the §3.2 naming convention. Where a bdd row pins "emits metric X", instrument it now so the metric ships with the feature (the telemetry seam, §3.5).
+Place each test in the layer matching its scenario tag (`[unit | integration | e2e]`), following the project's own test layout and naming convention. Where a bdd row pins "emits metric X", instrument it now so the metric ships with the feature (the telemetry seam, §1.8).
 
 **Characterization exemption.** A pure coverage-backfill of *existing, unmodified* production code cannot observe a meaningful RED. It is exempt from the per-test loop only when **no production code changes**, and must instead: (1) declare itself in the log; (2) drive the real red→green at the coverage-gate level (file moves `<100%` → `100%`); (3) prove each test bites via a mutation spot-check (break the line, confirm the test fails, revert).
 

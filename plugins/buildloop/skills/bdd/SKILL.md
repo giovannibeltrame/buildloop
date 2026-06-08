@@ -5,7 +5,7 @@ description: Phase ② — fill a build plan's HOW: acceptance scenarios in stri
 
 # /buildloop:bdd
 
-Define how the system must behave. Write acceptance scenarios into the bp's `## HOW — behavior (BDD)` table. This skill is the **single source of truth for the BDD scenario format** — the plan-gate audits against it and `tdd` consumes the layer tags. Apply the writing principles (AGENTS.md §3.4).
+Define how the system must behave. Write acceptance scenarios into the bp's `## HOW — behavior (BDD)` table. This skill is the **single source of truth for the BDD scenario format** — the plan-gate audits against it and `tdd` consumes the layer tags. Apply the writing principles (AGENTS.md §2).
 
 ## BDD scenario format
 
@@ -24,7 +24,7 @@ Acceptance scenarios live as table rows — one behavior per row:
 1. Read the bp's WHAT (from `ddd`) and the fc it links.
 2. For each behavior the feature must exhibit, write one row in the format above. A compound row is a refactor into several.
 3. Set each row's layer tag.
-4. **Pin telemetry.** Where a hypothesis from the fc maps to a metric, add an acceptance row that asserts the app **emits that metric's event/counter** (the telemetry seam, §3.5) — so instrumentation ships with the feature, not bolted on later.
+4. **Pin telemetry.** Where a hypothesis from the fc maps to a metric, add an acceptance row that asserts the app **emits that metric's event/counter** (the telemetry seam, §1.8) — so instrumentation ships with the feature, not bolted on later.
 
 ## Notes
 

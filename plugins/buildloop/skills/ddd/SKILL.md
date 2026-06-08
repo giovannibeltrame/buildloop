@@ -5,7 +5,7 @@ description: Phase ② — fill a build plan's WHAT (domain models, rules, servi
 
 # /buildloop:ddd
 
-Guard the WHAT. Define the domain in the bp's `## WHAT — domain (DDD)` section. This skill owns the **DDD anti-assumption discipline** for the project. Apply the writing principles (AGENTS.md §3.4).
+Guard the WHAT. Define the domain in the bp's `## WHAT — domain (DDD)` section. This skill owns the **DDD anti-assumption discipline** for the project. Apply the writing principles (AGENTS.md §2).
 
 ## Anti-assumption discipline
 
@@ -18,7 +18,7 @@ The guardian of the WHAT:
 
 ## Steps
 
-1. Read the bp, the fc it links, and the product docs the work touches (§1).
+1. Read the bp, the fc it links, and the project's product docs the work touches (if the project keeps any).
 2. Build the **Ubiquitous Language** table — every domain term used in the plan with a one-line definition. Reuse the project's existing terms; do not invent synonyms.
 3. Define **models · rules · services** — the entities, invariants, services, and boundaries the feature needs. Name what will be built, not just the behavior.
 4. For every ambiguity, write **one question** into an `## Open Questions` section. Never guess; resolve or surface them — do not paper over them.

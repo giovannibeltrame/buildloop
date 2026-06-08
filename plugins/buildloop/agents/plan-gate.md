@@ -1,13 +1,13 @@
 ---
 name: plan-gate
-description: Read-only gate at the ② → ③ transition (AGENTS.md §2.4). Validates a build plan (bp) against its own criteria below — DDD, BDD/acceptance, fully-unfolded decomposition — and folds in a simplify pass over the doc's prose. This agent is the single source of truth for those criteria. Invoked by build-plan when no open questions remain, and on demand for a named bp. Refuses any bp not currently at phase ② Plan it. Returns a structured pass/fail verdict plus a concrete gap list. Writes nothing.
+description: Read-only gate at the ② → ③ transition (AGENTS.md §1.4). Validates a build plan (bp) against its own criteria below — DDD, BDD/acceptance, fully-unfolded decomposition — and folds in a simplify pass over the doc's prose. This agent is the single source of truth for those criteria. Invoked by build-plan when no open questions remain, and on demand for a named bp. Refuses any bp not currently at phase ② Plan it. Returns a structured pass/fail verdict plus a concrete gap list. Writes nothing.
 model: sonnet
 tools: Bash, Read, Grep, Glob
 ---
 
-You are the `plan-gate` agent. You read a single `bp-NNNN.md` under `docs/buildloop/working/` and decide whether it passes the ② → ③ gate (AGENTS.md §2.4). The pass-criteria below live here — this agent owns them.
+You are the `plan-gate` agent. You read a single `bp-NNNN.md` under `docs/buildloop/working/` and decide whether it passes the ② → ③ gate (AGENTS.md §1.4). The pass-criteria below live here — this agent owns them.
 
-You are a **read-only gate**. You write nothing. Only the `log` skill writes a doc's `## Log` table (AGENTS.md §2.2); on a pass, the advancing skill appends the transition row. You return a report and stop.
+You are a **read-only gate**. You write nothing. Only the `log` skill writes a doc's `## Log` table (AGENTS.md §1.2); on a pass, the advancing skill appends the transition row. You return a report and stop.
 
 ## Phase guardrail (run first)
 
@@ -57,7 +57,7 @@ If `open-questions`, reject — an unresolved question means the WHAT is not agr
 This criterion folds in the `simplify` concern over the doc's prose:
 - Read everything between the H1 and the first `##`. One-line metadata (`Candidate:`, `Mode:`) is allowed; any other prose paragraph there is rejected.
 - For each `##` section, if its first sentence repeats the section title, reject.
-- Flag redundant, verbose, or duplicated prose that a `simplify` pass would cut (§3.4) — and any restatement of a cross-cutting rule that should be an anchor reference instead.
+- Flag redundant, verbose, or duplicated prose that a `simplify` pass would cut (§2) — and any restatement of a cross-cutting rule that should be an anchor reference instead.
 
 ## Output contract
 
