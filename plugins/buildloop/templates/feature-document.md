@@ -1,5 +1,5 @@
 <!--
-Feature document — TEMPLATE (living doc, phase ④ Ship it onward).
+Feature document. TEMPLATE (living doc, phase ④ Ship it onward).
 `ship-in-prd` creates it by distilling the fc + bp (which then archive), and
 `measure` reads Hypotheses & metrics against live prod data. `tweak-it` makes
 minimal per-change updates. Lives in docs/buildloop/living/, one per feature.
@@ -25,7 +25,7 @@ change history lives in CHANGELOG.md.
 
 <behaviors the system must keep upholding; each names the e2e test that guards it>
 
-- <invariant> — `tests/e2e/<…>`
+- <invariant>: `tests/e2e/<…>`
 
 ## Release
 
@@ -39,7 +39,7 @@ change history lives in CHANGELOG.md.
 
 ## Log
 
-<last transition only — change history lives in CHANGELOG.md>
+<last transition only; change history lives in CHANGELOG.md>
 <!-- ship-in-prd writes the row: buildloop log <doc> ship-in-prd "shipped to launch cohort" --to "④ Ship it" -->
 
 | when | who | phase → | what |

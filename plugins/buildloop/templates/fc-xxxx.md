@@ -1,5 +1,5 @@
 <!--
-Feature candidate — TEMPLATE (working doc, phase ① (Re)Think it).
+Feature candidate. TEMPLATE (working doc, phase ① (Re)Think it).
 `interview-me` creates it and fills Why/Narrative/Hypotheses/Metrics;
 `make-prototypes` fills Prototypes; `does-it-worth` writes the Verdict.
 Lives in docs/buildloop/working/. Archived under working/archive/ on ship.
@@ -12,11 +12,11 @@ Candidate: fc-NNNN
 
 ## Why
 
-<the problem and why it is worth solving — not a restatement of the headline>
+<the problem and why it is worth solving, not a restatement of the headline>
 
 ## Narrative
 
-<what makes this lovable — the story a user would tell>
+<what makes this lovable: the story a user would tell>
 
 ## Hypotheses
 
@@ -37,7 +37,7 @@ Candidate: fc-NNNN
 
 ## Verdict
 
-<yes | not yet | park | never> — <one-line rationale>
+<yes | not yet | park | never>: <one-line rationale>
 
 ## Log
 

@@ -1,5 +1,5 @@
 <!--
-Build plan — TEMPLATE (working doc, phase ② Plan it).
+Build plan. TEMPLATE (working doc, phase ② Plan it).
 `build-plan` creates it and orchestrates the fills:
   WHAT + Ubiquitous language ← ddd
   HOW (acceptance scenarios)  ← bdd
@@ -39,7 +39,7 @@ one Given/When/Then each (no And/But), mandatory layer tag. Each row = one test.
 
 ### Phases · steps · tasks
 
-<decomposition unfolded to its minimum — every task small enough to implement directly>
+<decomposition unfolded to its minimum, every task small enough to implement directly>
 
 1. <phase>
    1. <step>
@@ -47,11 +47,11 @@ one Given/When/Then each (no And/But), mandatory layer tag. Each row = one test.
 
 ### Critical files
 
-- <path> — <why it matters / what changes>
+- <path>: <why it matters / what changes>
 
 ### Trade-offs
 
-- <decision> — <alternative rejected and why>
+- <decision>: <alternative rejected and why>
 
 ## Log
 

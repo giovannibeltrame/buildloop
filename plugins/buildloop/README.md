@@ -4,13 +4,13 @@ A Claude Code plugin that operationalizes a small, opinionated development loop:
 
 > **(Re)Think it → Plan it → Build it → Ship it. Loop again.**
 
-Four phases, three gates between them, and a log table — not a status field — as the single source of truth for where each piece of work is. It bakes in BDD scenarios, DDD anti-assumption discipline, red-first TDD, and a quality gate that mixes automated checks with human sign-off.
+Four phases, three gates between them, and a log table (not a status field) as the single source of truth for where each piece of work is. It bakes in BDD scenarios, DDD anti-assumption discipline, red-first TDD, and a quality gate that mixes automated checks with human sign-off.
 
 It ships three layers:
 
-- **Declarative** — an `AGENTS.md` operating manual (provided as a template) holding the project-agnostic buildloop methodology: the phase/loop map, the gate contracts, and the writing principles.
-- **Enforcement** — twelve skills that drive the four phases (each owns its method rule: BDD → bdd, TDD → tdd, DDD → ddd, …).
-- **Auditing** — four review agents (each gate agent owns its pass-criteria).
+- **Declarative**: an `AGENTS.md` operating manual (provided as a template) holding the project-agnostic buildloop methodology: the phase/loop map, the gate contracts, and the writing principles.
+- **Enforcement**: twelve skills that drive the four phases (each owns its method rule: BDD → bdd, TDD → tdd, DDD → ddd, …).
+- **Auditing**: four review agents (each gate agent owns its pass-criteria).
 
 ## What's inside
 
@@ -48,9 +48,9 @@ bin/
   buildloop     — zero-dependency helper: next-id, doc-id, current-phase, open-questions, log
 ```
 
-Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code-review`, `/security-review`, `/verify`) along with the `plan` agent — Claude-only for now (YAGNI).
+Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code-review`, `/security-review`, `/verify`) along with the `plan` agent. Claude-only for now (YAGNI).
 
-`bin/buildloop` is added to the Bash tool's `PATH` automatically while the plugin is enabled, so the skills call a bare `buildloop …` — no path interpolation, no `python -m`. It only needs `python3` on the machine. The current phase of any doc is derived from its `## Log` table (`buildloop current-phase <doc>`), never a stored status.
+`bin/buildloop` is added to the Bash tool's `PATH` while the plugin is enabled, so the skills call a bare `buildloop …`, with no path interpolation and no `python -m`. It only needs `python3` on the machine. The current phase of any doc is derived from its `## Log` table (`buildloop current-phase <doc>`), never a stored status.
 
 ## Adopting it in a project
 
@@ -59,7 +59,7 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
    /plugin marketplace add giovannibeltrame/buildloop
    /plugin install buildloop@buildloop
    ```
-2. **Drop the operating manual in.** Copy `templates/AGENTS.md` to your repo root as `AGENTS.md` and fill the two `[PROJECT: …]` notes — the telemetry sink (§1.8) and the deploy/flag mechanism (in the `ship-in-prd` skill). The template is project-agnostic buildloop methodology; your own conventions (test layout, naming, coverage policy, product docs) stay in your project and the skills defer to them. **Keep the section numbering intact** — the skills and agents reference rules by number (e.g. `AGENTS.md §1.4`).
+2. **Drop the operating manual in.** Copy `templates/AGENTS.md` to your repo root as `AGENTS.md` and fill the two `[PROJECT: …]` notes: the telemetry sink (§1.8) and the deploy/flag mechanism (in the `ship-in-prd` skill). The template is project-agnostic buildloop methodology; your own conventions (test layout, naming, coverage policy, product docs) stay in your project and the skills defer to them. **Keep the section numbering intact**: the skills and agents reference rules by number (e.g. `AGENTS.md §1.4`).
 3. **Create the docs tree** the skills expect:
    ```
    docs/buildloop/{working,working/archive,living}/

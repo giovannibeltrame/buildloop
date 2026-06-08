@@ -33,7 +33,7 @@ Simplicity is key. Less complexity means more tokens for being used.
 
 BuildLoop is a **Claude Code plugin marketplace**. It currently ships one plugin:
 
-- **[`buildloop`](plugins/buildloop/)** — the loop above, made operational: twelve skills that drive four phases (①→②→③→④) through three gates, four review agents (think-gate, plan-gate, code-checker, ux-checker), a zero-dependency `buildloop` helper, and an `AGENTS.md` operating-manual template you adapt to your repo. State lives in each doc's `## Log` table, not a status field.
+- **[`buildloop`](plugins/buildloop/)** is the loop above, made operational: twelve skills that drive four phases (①→②→③→④) through three gates, four review agents (think-gate, plan-gate, code-checker, ux-checker), a zero-dependency `buildloop` helper, and an `AGENTS.md` operating-manual template you adapt to your repo. State lives in each doc's `## Log` table, not a status field.
 
 ```
 .claude-plugin/marketplace.json   ← marketplace manifest
@@ -49,7 +49,7 @@ From inside a project's Claude Code session:
 /plugin install buildloop@buildloop
 ```
 
-Or commit it so everyone who clones the project gets it automatically — add to the project's `.claude/settings.json`:
+Or commit it so everyone who clones the project gets it. Add it to the project's `.claude/settings.json`:
 
 ```json
 {
