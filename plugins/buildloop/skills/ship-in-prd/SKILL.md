@@ -5,7 +5,7 @@ description: Phase ④ — ship a build-gated feature: distill its fc + bp into 
 
 # /buildloop:ship-in-prd
 
-Ship the feature. Distill the working docs into the living one, then deploy and release as separate acts. This skill owns the **deploy ≠ release** seam. Apply the writing principles ([AGENTS.md §4.4](AGENTS.md)).
+Ship the feature. Distill the working docs into the living one, then deploy and release as separate acts. This skill owns the **deploy ≠ release** seam. Apply the writing principles (AGENTS.md §3.4).
 
 ## Deploy ≠ release
 
@@ -25,8 +25,8 @@ The two are separate acts, and keeping them separate is what makes rollout and r
    - What changed, and which kind of change? → the CHANGELOG line.
    - Which behaviors/rules must keep working? → the e2e-guarded invariants.
    - Which strict technical facts must a maintainer know? → technical notes.
-2. **Write the living feature-document** ([§3.5](AGENTS.md)). For a new feature, copy `templates/feature-document.md` to `docs/buildloop/living/<feature-name>.md`; for a re-ship (from `tweak-it`), update the existing one. Distill from the fc + bp:
-   - **Hypotheses & metrics** — copied from the fc so `measure` can read them (the telemetry seam, [§4.5](AGENTS.md)).
+2. **Write the living feature-document** (§2.5). For a new feature, copy `templates/feature-document.md` to `docs/buildloop/living/<feature-name>.md`; for a re-ship (from `tweak-it`), update the existing one. Distill from the fc + bp:
+   - **Hypotheses & metrics** — copied from the fc so `measure` can read them (the telemetry seam, §3.5).
    - **Invariants (e2e-guarded)** — each naming its `tests/e2e/` test.
    - **Release** — the flag name + launch cohort.
    - **Technical notes.**
@@ -34,7 +34,7 @@ The two are separate acts, and keeping them separate is what makes rollout and r
    ```
    buildloop log docs/buildloop/living/<feature-name>.md ship-in-prd "shipped to launch cohort" --to "④ Ship it"
    ```
-3. **Prepend a CHANGELOG.md entry** (repo root) — WHO changed WHAT, ≤280 chars, linked to the fc ([§5.1](AGENTS.md)).
+3. **Prepend a CHANGELOG.md entry** (repo root) — WHO changed WHAT, ≤280 chars, linked to the fc (§4.1).
 4. **Deploy, then release** per the seam above: merge → main triggers CI/CD; set the flag to the launch cohort.
 5. **Archive the working docs.** Move the fc and bp to `docs/buildloop/working/archive/` (their numbers stay reserved). The living feature-document is now the source of truth.
 6. Hand off to `/buildloop:measure` once the cohort accrues live data.

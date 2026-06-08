@@ -3,7 +3,7 @@ BuildLoop operating manual — TEMPLATE.
 
 Drop this file at your repository root as `AGENTS.md` and adapt the bracketed
 [PROJECT: …] notes to your stack. The buildloop plugin's skills and agents
-reference this file by section number (e.g. "AGENTS.md §3.4"), so keep the
+reference this file by section number (e.g. "AGENTS.md §2.4"), so keep the
 section numbering intact when you edit. Delete a section's content only if you
 also remove the rule it encodes everywhere it is referenced.
 
@@ -18,19 +18,7 @@ plan-gate). This file points at those owners; it does not restate them.
 
 This file is the canonical operating manual for this project. It is tool-agnostic — every agent, skill, and human contributor reads from here. `CLAUDE.md` at the root is a thin pointer to this file plus the few non-negotiables that must always load.
 
-## 1. Where rules live
-
-Three-layer convention for every rule:
-
-> **Declarative text lives in AGENTS.md. Operational enforcement lives in skills. Auditing lives in agents.**
-
-- Change a cross-cutting rule, the loop, or a gate contract → edit AGENTS.md.
-- Change how a method is enforced (BDD/TDD/DDD, the build-gate sequence, deploy) → edit its skill.
-- Change a gate's pass-criteria or any audit → edit its agent.
-
-AGENTS.md keeps only what spans the loop — project context, the phases, and the gate contracts. Anything owned by a single skill or agent lives there and is **referenced by name** here, never restated.
-
-## 2. Product alignment
+## 1. Product alignment
 
 Before product, architecture, analytics, UI, or wording changes, check your project's product docs and keep changes aligned with them.
 
@@ -41,11 +29,11 @@ Before product, architecture, analytics, UI, or wording changes, check your proj
 
 `interview-me` and `ddd` read the product docs a candidate touches via this section, so name them here.]
 
-## 3. The build loop
+## 2. The build loop
 
 (Re)Think it → Plan it → Build it → Ship it. Loop again.
 
-### 3.1 Phases and gates
+### 2.1 Phases and gates
 
 ```mermaid
 flowchart LR
@@ -71,7 +59,7 @@ flowchart LR
 - **New idea / problem** enters at ① via `interview-me`.
 - **Change to a shipped feature** enters via `tweak-it`, which re-enters the loop at ② (lite) or ① (full).
 
-### 3.2 State lives in the log table
+### 2.2 State lives in the log table
 
 There is no `Status:` field. Each doc carries a `## Log` table that is the single source of truth for "where are we."
 
@@ -81,7 +69,7 @@ There is no `Status:` field. Each doc carries a `## Log` table that is the singl
 - **No top-of-doc cache.** Derive the phase from the log; `buildloop current-phase <doc>` does this deterministically.
 - **Canonical phase tokens**: `① (Re)Think it · ② Plan it · ③ Build it · ④ Ship it`.
 
-### 3.3 The phases
+### 2.3 The phases
 
 Each phase names the skills that run in it and the artifact it produces. Skills carry their own method rules; this section is the WHAT and WHY.
 
@@ -92,7 +80,7 @@ Each phase names the skills that run in it and the artifact it produces. Skills 
 | **③ Build it** | `tdd` (red → green → refactor) → `build-gate` | tests + code |
 | **④ Ship it** | `ship-in-prd` (deploy + release) → `measure` (hypothesis verdict) → `tweak-it` (bugfix / improvement) | `feature-document.md` + `CHANGELOG.md` |
 
-### 3.4 Gates
+### 2.4 Gates
 
 A gate is a **read-only verdict function of doc state** — never of which skill ran. Because it depends only on artifacts-present-and-valid and never writes, it works identically whether spawned by the advancing skill or invoked standalone (`/<gate> <doc>`); on pass, the write of the transition row is always the separate step owned by whoever advances.
 
@@ -106,7 +94,7 @@ A gate is a **read-only verdict function of doc state** — never of which skill
 
 **Build-gate bounce** routes a failure to the phase that owns the defect: implementation wrong → ③ (`tdd`); scenario mis-modeled → ② (`build-plan`); premise wrong → ① (`interview-me`).
 
-### 3.5 Doc kinds and lifecycle
+### 2.5 Doc kinds and lifecycle
 
 | Doc | Kind | Path | Role |
 |---|---|---|---|
@@ -119,7 +107,7 @@ A gate is a **read-only verdict function of doc state** — never of which skill
 - **feature-document.md is the living doc.** `ship-in-prd` distills the fc + bp hypotheses, metrics, and invariants into it, so `measure` has something to read. It keeps only its **last transition**; change history goes to `CHANGELOG.md`.
 - **No constants doc.** Invariants the system must uphold are declared in a feature-document's **"Invariants (e2e-guarded)"** section and guarded by e2e tests.
 
-### 3.6 Skill contracts
+### 2.6 Skill contracts
 
 Each skill declares **Requires (state) / Produces / Standalone fallback**. *Requires* is a precondition on state (artifact present + phase read from the log), never "skill X ran first." Skills sequence themselves because one skill's Requires is another's Produces; neither names the other.
 
@@ -140,20 +128,20 @@ Each skill declares **Requires (state) / Produces / Standalone fallback**. *Requ
 | `log` | a doc (creates the `## Log` table if missing) | appended row (work or transition) | creates the table |
 
 **Two Requires that nothing else Produces — external inputs, by design:**
-- `measure` needs **live prod data** — from telemetry on the shipped cohort, not any doc (§4.5).
+- `measure` needs **live prod data** — from telemetry on the shipped cohort, not any doc (§3.5).
 - `ship-in-prd` needs the **deploy + feature-flag** mechanism — infra, not a skill output (owned by the `ship-in-prd` skill).
 
 Everything else chains: an upstream Produces satisfies each Requires.
 
-### 3.7 Auto-suggest at triage
+### 2.7 Auto-suggest at triage
 
 When a user message describes building, fixing, or changing something, Claude proposes the entry skill before writing code — `interview-me` for a new idea, `tweak-it` for a change to a shipped feature. User confirms or redirects. No auto-firing; the explicit skill invocation is always available. Questions, exploration, and discussion do not trigger the suggestion.
 
-## 4. Project conventions
+## 3. Project conventions
 
 Cross-cutting rules with project-specific content. Method rules (BDD/TDD/DDD) are not here — they live in their skills.
 
-### 4.1 Test layers
+### 3.1 Test layers
 
 | Layer | Source | Lives in | Written during | Audited by |
 |---|---|---|---|---|
@@ -163,7 +151,7 @@ Cross-cutting rules with project-specific content. Method rules (BDD/TDD/DDD) ar
 
 `code-checker` audits that every scenario has a test file in the layer matching its tag. [PROJECT: adjust test-directory paths to your layout if they differ.]
 
-### 4.2 Test naming convention
+### 3.2 Test naming convention
 
 Mandatory across all layers. The class / suite name transliterates the scenario's `Given / When`; the methods / cases correspond to the `Then`s — one assertion each. This gives grep-traceability between doc scenarios and code.
 
@@ -183,11 +171,11 @@ describe('Subject when condition', () => {
 ```
 ]
 
-### 4.3 100% coverage + non-product files list
+### 3.3 100% coverage + non-product files list
 
 **Rule**: 100% line coverage on all source files. Audited by `code-checker` at the build-gate.
 
-**Exclusions** — the **non-product files list**, single source of truth, reused for the doc-less commit exception (§5.1). [PROJECT: maintain this list for your repo. Typical entries:]
+**Exclusions** — the **non-product files list**, single source of truth, reused for the doc-less commit exception (§4.1). [PROJECT: maintain this list for your repo. Typical entries:]
 
 - config / manifest files (`.env*`, `*.cfg`, `pyproject.toml`, `package.json`)
 - `.claude/settings.json`, `.claude/launch.json`
@@ -197,7 +185,7 @@ describe('Subject when condition', () => {
 
 **Thin CLI shim** = a file whose top-level code is only argument parsing + a single delegating call to library code. If logic creeps in, it crosses the line. Judgment call audited by `code-checker`.
 
-### 4.4 Writing principles — DRY, KISS, YAGNI
+### 3.4 Writing principles — DRY, KISS, YAGNI
 
 Apply to every text surface — AI agents and humans alike, in buildloop docs, code comments, test names, commit messages, PR bodies, and agent self-checks:
 
@@ -207,7 +195,7 @@ Apply to every text surface — AI agents and humans alike, in buildloop docs, c
 
 The think-gate and plan-gate enforce concrete style checks in their rubrics. Humans judge the rest.
 
-### 4.5 Telemetry seam
+### 3.5 Telemetry seam
 
 `measure` needs live prod data, which no skill produces. The chain that supplies it:
 
@@ -219,9 +207,9 @@ The think-gate and plan-gate enforce concrete style checks in their rubrics. Hum
 
 This closes the hypothesis loop: defined in ①, instrumented in ③, released to a cohort in ④, judged in ④.
 
-## 5. Commits, PRs, sequence numbers
+## 4. Commits, PRs, sequence numbers
 
-### 5.1 Commit message format
+### 4.1 Commit message format
 
 ```
 (<doc-id>): <short imperative description>
@@ -237,10 +225,10 @@ This closes the hypothesis loop: defined in ①, instrumented in ③, released t
 - **TDD cycle commits** inside phase ③ carry explicit tags in the description (`RED —` / `GREEN —` / `refactor —`); `code-checker` audits the discipline. The tag rule lives in the `tdd` skill.
 
 **Doc-less commit exceptions**:
-- Commits touching only files in the **non-product files list** (§4.3).
+- Commits touching only files in the **non-product files list** (§3.3).
 - Commits touching only README or non-buildloop docs.
 
-### 5.2 PR template
+### 4.2 PR template
 
 Lives at `.github/PULL_REQUEST_TEMPLATE.md`. Body:
 
@@ -274,13 +262,13 @@ See `bp-NNNN.md` § Log → newest row.
 
 **Lifecycle**: the PR opens when `build-gate` starts (handing off to automated review) with the UAT box unchecked. UAT happens on the PR branch. UAT pass + all boxes checked = merge = phase ④.
 
-### 5.3 Sequence number scheme
+### 4.3 Sequence number scheme
 
 `NNNN` = 4 digits, zero-padded, per kind (`fc-0001…`, `bp-0001…`). `buildloop next-id <fc|bp>` issues the next, reserving archived numbers. Expanding to 5 digits is a clean future change if a kind approaches 9999.
 
-## 6. Skills and agents
+## 5. Skills and agents
 
-### 6.1 Namespace
+### 5.1 Namespace
 
 BuildLoop skills use the `buildloop:` namespace: `/buildloop:interview-me`, `make-prototypes`, `does-it-worth`, `build-plan`, `ddd`, `bdd`, `tdd`, `build-gate`, `ship-in-prd`, `measure`, `tweak-it`, `log`.
 

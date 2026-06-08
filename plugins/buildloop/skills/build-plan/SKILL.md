@@ -5,12 +5,12 @@ description: Phase ② orchestrator — create a build plan (bp) from a feature 
 
 # /buildloop:build-plan
 
-Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decomposition into one `bp-NNNN.md`, then gate it. Apply the writing principles ([AGENTS.md §4.4](AGENTS.md)).
+Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decomposition into one `bp-NNNN.md`, then gate it. Apply the writing principles (AGENTS.md §3.4).
 
 ## Steps
 
 1. **Mode.** *Full* (default) when planning a fresh fc — it must be past the think-gate (its log shows phase `② Plan it`; check `buildloop current-phase <fc>`). *Lite* when entered from `tweak-it` — thin and fast, WHY/narrative unchanged; still produces a real WHAT/HOW/plan, just minimal.
-2. **Create the bp.** `buildloop next-id bp`; copy `templates/bp-xxxx.md` to `docs/buildloop/working/bp-NNNN.md` ([§3.5](AGENTS.md)); set `Candidate:` to the fc and `Mode:`. Write the first row:
+2. **Create the bp.** `buildloop next-id bp`; copy `templates/bp-xxxx.md` to `docs/buildloop/working/bp-NNNN.md` (§2.5); set `Candidate:` to the fc and `Mode:`. Write the first row:
    ```
    buildloop log docs/buildloop/working/bp-NNNN.md build-plan "created from fc-NNNN" --to "② Plan it"
    ```
@@ -25,7 +25,7 @@ Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decompo
    If `open-questions`, stop — resolve them before gating (the anti-assumption discipline `ddd` owns).
 5. **Gate and advance.** Invoke the `plan-gate` agent on the bp.
    - **Pass** → `buildloop log <bp> "plan-gate · build-plan advances" "gate passed" --to "③ Build it"`, then hand off to `/buildloop:tdd`.
-   - **Fail** → address the gap list, re-run. Gates never write; the advancing skill does (§3.4).
+   - **Fail** → address the gap list, re-run. Gates never write; the advancing skill does (§2.4).
 
 ## Notes
 

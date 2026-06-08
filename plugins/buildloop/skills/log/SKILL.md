@@ -5,7 +5,7 @@ description: Append a row to a buildloop doc's ## Log table — the single sourc
 
 # /buildloop:log
 
-The **single writer** of the `## Log` table. That table is the only source of truth for "where are we" — there is no `Status:` field. Apply the log-table state model ([AGENTS.md §3.2](AGENTS.md)); do not restate it.
+The **single writer** of the `## Log` table. That table is the only source of truth for "where are we" — there is no `Status:` field. Apply the log-table state model (AGENTS.md §2.2); do not restate it.
 
 Two row kinds, fixed four columns `when | who | phase → | what`:
 
@@ -26,7 +26,7 @@ Two row kinds, fixed four columns `when | who | phase → | what`:
      buildloop log <doc-path> "<who>" "<what>" --to "<② Plan it>"
      ```
    Phase tokens are canonical: `① (Re)Think it · ② Plan it · ③ Build it · ④ Ship it`.
-3. On a transition, surface the commit footer for whoever commits it ([AGENTS.md §5.1](AGENTS.md)):
+3. On a transition, surface the commit footer for whoever commits it (AGENTS.md §4.1):
    ```
    Log: <doc-id> <From> → <To>
    ```
