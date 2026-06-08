@@ -1,26 +1,38 @@
 ---
 name: log
-description: Append a one-line process-log entry for a buildloop status transition (and emit the matching commit footer). The helper the other buildloop skills call at transition time. Use when a doc's Status field changes, or when the user signals a human-owned transition ("I prioritized…", "I approved the UAT").
+description: Append a row to a buildloop doc's ## Log table — the single source of truth for which phase the doc is in — and surface the matching commit footer. The helper every other buildloop skill and gate-advance calls at transition time. Use when a phase advances, on intra-phase work worth recording, or when the user signals a human-owned step ("I prioritized…", "I approved the UAT").
 ---
 
 # /buildloop:log
 
-Record a status transition in a doc's `## Process log` per [AGENTS.md §4.8](AGENTS.md), and surface the commit footer per [§5.1](AGENTS.md). Do not restate those rules — apply them.
+The **single writer** of the `## Log` table. That table is the only source of truth for "where are we" — there is no `Status:` field. Apply the log-table state model in AGENTS.md; do not restate it.
+
+Two row kinds, fixed four columns `when | who | phase → | what`:
+
+- **work row** — intra-phase progress; `phase →` is left as `—`.
+- **transition row** — a phase advance; `phase →` carries `<From> → <To>`. The current phase is the To-side of the most recent transition row.
 
 ## Steps
 
-1. Identify the doc (`docs/buildloop/<kind>/<doc-id>.md`), the tag (`auto` or `human, manual`), and the transition text (e.g. `status 4 → 5`, or a free-text human note).
-2. Append the entry deterministically:
+1. Identify the doc, the `who`, and the `what` (≤280 chars):
+   - `who` folds the auto/human distinction — a named skill/agent is automated; the literal `human` is a manual step. For a gate advance, name both: `<gate> · <advancer> advances`.
+2. Append the row deterministically (append-only, newest at bottom — never edit an existing row):
+   - work row:
+     ```
+     buildloop log <doc-path> "<who>" "<what>"
+     ```
+   - transition row (only `--to`; From is auto-filled from the doc's current phase):
+     ```
+     buildloop log <doc-path> "<who>" "<what>" --to "<② Plan it>"
+     ```
+   Phase tokens are canonical: `① (Re)Think it · ② Plan it · ③ Build it · ④ Ship it`.
+3. On a transition, surface the commit footer for whoever commits it:
    ```
-   buildloop log <doc-path> "<tag>" "<text>"
-   ```
-   This writes `- [<tag>] <today> <text>` under the doc's `## Process log` (the last section, per §4.8).
-3. Surface the commit footer for whoever commits the transition:
-   ```
-   Process-log: <doc-id> status <X> → <Y>
+   Log: <doc-id> <From> → <To>
    ```
 
 ## Notes
 
-- One line per entry. Live state goes in the doc at transition time; the durable trail is the commit footer (§4.8).
-- For human-owned steps (3 → 4, terminal flips, manual 7 → 5/2 signals), auto-suggest logging in the moment rather than waiting.
+- **Gates never write.** A gate returns a verdict; on pass the advancing skill (or, for a standalone gate run, the user/Claude) calls this skill to append the transition row.
+- **Living-doc retention.** Working docs (`fc`/`bp`) keep the full log until they archive on ship. A `feature-document.md` keeps only its last transition — change history lives in `CHANGELOG.md`. That trimming happens when `ship-in-prd` distills the doc, not here.
+- For human-owned steps, auto-suggest logging in the moment rather than waiting.

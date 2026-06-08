@@ -299,7 +299,7 @@ The single source of truth and the things every skill/agent calls. Nothing downs
 - **Rewrite `templates/AGENTS.md`** to this brainstorm: 4 phases ①–④; the log-table state model (drop the `Status:` field and the §4.8 status-sync hook); the three gate contracts; the skill-contracts table (Requires/Produces/Standalone); docs map + lifecycle; design rules; the build-gate 8-step sequence; the telemetry seam. Retarget every `§`-reference the skills cite.
 - **Upgrade the `log` skill to the table format** (two row kinds work/transition; append-only, single writer; current phase = the last `phase →`). Foundational because every gate transition appends through it.
 - **Update `bin/buildloop`**: id scheme → `fc-xxxx` / `bp-xxxx`; replace status-field reads with log-table append + phase derivation (`current-phase`, `next-id`, `open-questions`); drop the epic/fix/hyp/cnst id + `can-promote` logic.
-- **Define the doc shapes/templates**: `fc-xxxx` (WHY · narrative · hypotheses · metrics · prototypes · verdict), `bp-xxxx` (phases · WHAT/DDD · HOW/BDD · plan), `feature-document.md` (living, incl. "Invariants (e2e-guarded)"), `CHANGELOG.md`. Settle the docs directory layout + the archive-on-ship mechanism.
+- **Define the doc shapes/templates**: `fc-xxxx` (WHY · narrative · hypotheses · metrics · prototypes · verdict), `bp-xxxx` (phases · WHAT/DDD · HOW/BDD · plan), `feature-document.md` (living, incl. "Invariants (e2e-guarded)"), `CHANGELOG.md`. Layout: fc/bp live in `docs/buildloop/working/`, feature-documents in `docs/buildloop/living/`; ship distills the fc/bp into a living feature-document and archives them under `docs/buildloop/working/archive/`.
 
 ### M1 — (Re)Think it ①
 - `interview-me` (new — WHY/narrative/hypotheses/metrics, creates the fc), `make-prototypes` (new — lo-fi), `does-it-worth` (new — yes/not-yet/park/never).
@@ -312,7 +312,7 @@ The single source of truth and the things every skill/agent calls. Nothing downs
 ### M3 — Build it ③
 - `tdd` (rename from implement; owns red→green→refactor and now owns RED, since test-writer is gone).
 - `code-checker` (simplify), `ux-checker` (new — optional, UI diffs).
-- Wire the build-gate's ordered 8-step sequence (ux · simplify · code-checker · code-review · security-review · verify · PR · UAT) and the three-way bounce (impl→③ · scenario→② · premise→①). Built-ins couple in directly (YAGNI) — no abstraction layer.
+- `build-gate` (new **skill**, thin orchestrator) drives the ordered 8-step sequence (ux · simplify · code-checker · code-review · security-review · verify · PR · UAT) and the three-way bounce (impl→③ · scenario→② · premise→①). It's a skill, not an agent, because it mixes agents + skills + the human PR/UAT steps. Built-ins couple in directly (YAGNI) — no abstraction layer.
 
 ### M4 — Ship it ④
 - `ship-in-prd` (repurpose promote — deploy≠release seam; writes feature-document + CHANGELOG; sets release flag + cohort).
@@ -324,8 +324,24 @@ The single source of truth and the things every skill/agent calls. Nothing downs
 ### M6 — Surfaces & docs
 - Update plugin `README.md`, root `README.md`, `plugin.json` description, and the marketplace manifest to the new skill/agent/doc maps and the 4-phase loop.
 
-### Open decisions to confirm before coding
-1. **Docs layout + archive.** Final directory shape for fc/bp + features, and how fc/bp are archived on ship.
-2. **Log-table parser.** How strict the markdown-table parsing in `bin/buildloop` must be (tolerant vs. fixed columns).
-3. **Build-gate runner.** Who drives the 8-step sequence — a thin orchestrator skill, or Claude in-thread — given steps 7–8 (PR · UAT) are human.
-4. **Gate agents standalone?** Whether think-gate / plan-gate are invocable on their own or only spawned by the advancing skill.
+### Resolved decisions
+1. **Docs layout + archive.** fc/bp in `docs/buildloop/working/`; feature-documents in `docs/buildloop/living/`. Ship distills fc/bp into a living feature-document and archives the originals under `docs/buildloop/working/archive/`.
+2. **Log table — fixed 4-column schema** (parser relies on column positions, not heuristics). One `## Log` section holds exactly one table:
+
+   ```
+   | when | who | phase → | what |
+   |---|---|---|---|
+   | 2026-06-08 14:02 | interview-me                       | → ① (Re)Think it           | created; WHY + 3 hypotheses |
+   | 2026-06-08 14:05 | does-it-worth                      | —                          | verdict: yes                |
+   | 2026-06-08 14:06 | think-gate · interview-me advances | ① (Re)Think it → ② Plan it | gate passed                 |
+   ```
+   - **when** — `YYYY-MM-DD HH:MM`, stamped by `bin/buildloop` (runs locally, real timestamps available).
+   - **who** — the acting skill/agent; folds the auto/human distinction (named skill/agent ⇒ auto, literal `human` ⇒ manual). Transition rows use `<gate> · <advancer> advances`.
+   - **phase →** — `—` for work rows; `<From> → <To>` for transition rows. Canonical phase tokens (number + name): `① (Re)Think it · ② Plan it · ③ Build it · ④ Ship it`.
+   - **what** — ≤280 chars.
+   - **Row kind is derived** (no extra column): `phase →` populated ⇒ transition. **Current phase = the To-side of the last row with a non-empty `phase →`.** The creating skill always writes a first `→ ① (Re)Think it` row, so a transition always exists.
+3. **Build-gate runner.** A thin orchestrator **skill** (`build-gate`) drives the 8 steps + bounce. think-gate / plan-gate stay read-only **agents**; build-gate is a skill because it mixes agents, skills, and the human PR/UAT steps.
+4. **Gates are both standalone and spawned**, because a gate is a read-only verdict function of doc *state* and never writes the transition row:
+   - **Spawned** — the advancing skill invokes the gate, gets `pass`, then calls `log` to append the transition row.
+   - **Standalone** — `/think-gate <doc>` runs the same rubric and returns verdict + gap list; on pass, the human or Claude calls `log`. The write is always the separate step owned by whoever advances.
+   - **Already-past guard** (replaces the old `Status: ≥ 4` refusal): the gate reads current phase from the log; if the doc is already past this gate's phase, it returns a one-line "already at phase X" and skips the rubric.
