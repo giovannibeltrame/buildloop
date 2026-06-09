@@ -25,7 +25,7 @@ Tackle the bp's HOW scenarios in sequence, one test at a time. One scenario unfo
 
 1. **RED — write the failing test yourself.** No separate test-writer; `tdd` owns RED. Name it for the behavior in domain language — a concrete example (`adding 2 + 3 returns 5`), not an abstract claim (`can add numbers`), structured Arrange–Act–Assert. Run it. Observe **RED**, failing for the right reason rather than a setup or import error. Commit with a `RED —` tag (doc-id `bp-NNNN`). The `RED —` / `GREEN —` / `refactor —` commit-tag convention is this skill's; `code-checker` audits red-first discipline by greping for it.
 2. **GREEN — write the minimum code to pass.** Nothing more. Prefer **Fake It** (a hardcoded value) when the solution isn't yet obvious, and let the next test triangulate it into the real rule; reach for the simpler transformation first (see the priority order in the reference). Commit with a `GREEN —` tag.
-3. **REFACTOR — with all prior tests green.** This is where design happens: kill duplication (only on the **Rule of Three** — the third occurrence), extract long methods, sharpen names, simplify conditionals. Behavior unchanged. Commit with a `refactor —` tag if anything changed.
+3. **REFACTOR — with all prior tests green.** Design happens here: kill duplication (only on the **Rule of Three** — the third occurrence), extract long methods, sharpen names, simplify conditionals. Behavior unchanged. Commit with a `refactor —` tag if anything changed.
 
 Locks:
 

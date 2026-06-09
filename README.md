@@ -3,7 +3,7 @@ A simple tool for building software with AI.
 
 ## Purpose
 
-Simplicity is key. Less complexity means more tokens for being used.
+Less complexity leaves more tokens for the work itself.
 
 ## Workflow
 

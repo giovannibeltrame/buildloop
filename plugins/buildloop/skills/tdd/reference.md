@@ -40,7 +40,7 @@ it('adding 2 + 3 returns 5', ...)
 Two strategies:
 
 1. **Fake It** — return a hardcoded value. The simplest thing that turns the bar green.
-2. **Obvious Implementation** — write the real logic when the solution is genuinely clear.
+2. **Obvious Implementation** — write the real logic when the solution is clear.
 
 **Prefer Fake It when unsure.** Let the next test force the fake to generalize. Jumping
 to a clever implementation skips the tests that would have pinned its edges.
