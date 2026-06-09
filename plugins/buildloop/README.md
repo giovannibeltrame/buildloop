@@ -61,9 +61,14 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
    ```
    (To commit the marketplace so everyone who clones the project gets it, see the [marketplace README](https://github.com/giovannibeltrame/buildloop#install-in-any-project).)
 2. **The methodology loads itself.** The plugin's skills and agents read the bundled `AGENTS.md` via `${CLAUDE_PLUGIN_ROOT}`, so there's nothing to copy. Your own conventions (test layout, naming, coverage policy, product docs) stay in your project, and the skills defer to them; the only project-specific bits are two `[PROJECT: …]` notes — the telemetry sink (§2.8) and the deploy/flag mechanism (in `ship-in-prd`) — which the skills that need them prompt for. *Optional:* copy `plugins/buildloop/AGENTS.md` to your repo root as `AGENTS.md` and add a `CLAUDE.md` that imports it (`@AGENTS.md`) to load it once per session (cheaper than per-agent reads) and to fill those notes in-file.
-3. **Create the docs tree** the skills expect:
+3. **Create the docs tree** the skills expect — three folders:
    ```
-   docs/buildloop/{working,working/archive,living}/
+   docs/buildloop/working/           ← active fc-NNNN / bp-NNNN docs
+   docs/buildloop/working/archive/   ← parked or retired working docs
+   docs/buildloop/living/            ← one feature-document per shipped feature
+   ```
+   ```
+   mkdir -p docs/buildloop/working/archive docs/buildloop/living
    ```
    (`CHANGELOG.md` lives at the repo root.)
 4. **Add your project-specific gate agents** (optional). The plugin ships the generic `code-checker`, `think-gate`, `plan-gate`, and `ux-checker`. If your stack needs more (e.g. a `security-reviewer`), add it under `.claude/agents/` and name it in `AGENTS.md §2.9`.
