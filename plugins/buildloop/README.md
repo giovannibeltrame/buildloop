@@ -82,4 +82,14 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
         └───────────────── ④ ──────────── tweak lite → ② ───┘ fail · impl → ③
 ```
 
-A new idea enters at ①; a change to a shipped feature enters via `tweak-it`. Gates check *state* (artifacts present + valid), never *history*, so every skill and agent also works standalone. See `AGENTS.md` for the full contracts.
+A new idea enters at ①; a change to a shipped feature enters via `tweak-it`. See `AGENTS.md` for the full contracts.
+
+## Use any skill or agent on its own
+
+You don't have to run the whole loop. Because the gates check *state* (artifacts present + valid), never *history*, every skill and agent also works standalone — invoke just the one you want:
+
+- `/buildloop:ddd` to model a domain you're stuck on, `/buildloop:bdd` to draft acceptance scenarios, `/buildloop:tdd` to drive a single change red → green → refactor.
+- The `code-checker` or `ux-checker` agent to audit a diff with no upstream doc.
+- Any phase skill on a doc that skipped the prior phase — the skill checks for the artifacts it needs and asks for them if they're missing, rather than assuming a history.
+
+Pick the loop when you want the full think → ship discipline; pick a single tool when you just need that one thing.
