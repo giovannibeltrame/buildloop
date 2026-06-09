@@ -12,7 +12,7 @@
         "url": "https://github.com/giovannibeltrame/buildloop.git",
         "path": "plugins/buildloop",
         "ref": "buildloop--v0.1.1",
-        "sha": "0df857bf6734dafa234125aeffc548d0c4f28017"
+        "sha": "6e00f02f7fe257eecbfe30ea399d1ec32afe1a6f"
       },
       "version": "0.1.1",
       "description": "(Re)Think it → Plan it → Build it → Ship it: a four-phase loop with TDD, BDD, DDD, log-table state and quality gates, operationalized as skills + review agents."
