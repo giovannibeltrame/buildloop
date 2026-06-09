@@ -1,6 +1,6 @@
 ---
 name: does-it-worth
-description: Phase ① filter: judge a feature candidate's prototypes and record a verdict (yes / not yet / park / never). On "yes" it runs the think-gate and, on pass, advances the fc to ② Plan it. Use after make-prototypes on an fc, or when deciding whether a candidate is worth building.
+description: "Phase ① filter: judge a feature candidate's prototypes and record a verdict (yes / not yet / park / never). On \"yes\" it runs the think-gate and, on pass, advances the fc to ② Plan it. Use after make-prototypes on an fc, or when deciding whether a candidate is worth building."
 ---
 
 # /buildloop:does-it-worth

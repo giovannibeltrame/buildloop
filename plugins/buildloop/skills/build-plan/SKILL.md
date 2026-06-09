@@ -1,6 +1,6 @@
 ---
 name: build-plan
-description: Phase ② orchestrator: create a build plan (bp) from a feature candidate and fill it by sub-invoking ddd (WHAT), bdd (HOW), and the plan agent (decomposition), then run the plan-gate and advance ②→③. Full from a think-gated fc, or lite from tweak-it. Use when planning an approved candidate or a tweak.
+description: "Phase ② orchestrator: create a build plan (bp) from a feature candidate and fill it by sub-invoking ddd (WHAT), bdd (HOW), and the plan agent (decomposition), then run the plan-gate and advance ②→③. Full from a think-gated fc, or lite from tweak-it. Use when planning an approved candidate or a tweak."
 ---
 
 # /buildloop:build-plan

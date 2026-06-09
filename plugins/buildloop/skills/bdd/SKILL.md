@@ -1,6 +1,6 @@
 ---
 name: bdd
-description: Phase ②: fill a build plan's HOW: acceptance scenarios in strict BDD table form, one behavior per row with a mandatory layer tag. Owns the BDD scenario format for the whole project. Sub-invoked by build-plan, or run directly on a bp.
+description: "Phase ②: fill a build plan's HOW: acceptance scenarios in strict BDD table form, one behavior per row with a mandatory layer tag. Owns the BDD scenario format for the whole project. Sub-invoked by build-plan, or run directly on a bp."
 ---
 
 # /buildloop:bdd

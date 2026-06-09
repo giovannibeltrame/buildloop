@@ -1,6 +1,6 @@
 ---
 name: build-gate
-description: Phase ③ exit gate: a thin orchestrator that runs the 8-step build-gate sequence (ux-checker · simplify · code-checker · code-review · security-review · verify · PR review · UAT) in order, bounces a failure to the phase that owns it, and on full pass advances ③→④. Use when tdd reports a bp's implementation done.
+description: "Phase ③ exit gate: a thin orchestrator that runs the 8-step build-gate sequence (ux-checker · simplify · code-checker · code-review · security-review · verify · PR review · UAT) in order, bounces a failure to the phase that owns it, and on full pass advances ③→④. Use when tdd reports a bp's implementation done."
 ---
 
 # /buildloop:build-gate

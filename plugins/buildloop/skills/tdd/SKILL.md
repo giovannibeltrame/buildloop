@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Phase ③: drive a build plan's implementation with red → green → refactor, owning the failing test (RED) as well as the code. Owns the project's red-first discipline. Tagged commits, one test at a time, scenarios in sequence; hands off to the build-gate. Use when implementing a plan-gated (③ Build it) bp.
+description: "Phase ③: drive a build plan's implementation with red → green → refactor, owning the failing test (RED) as well as the code. Owns the project's red-first discipline. Tagged commits, one test at a time, scenarios in sequence; hands off to the build-gate. Use when implementing a plan-gated (③ Build it) bp."
 ---
 
 # /buildloop:tdd

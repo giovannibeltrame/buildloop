@@ -1,6 +1,6 @@
 ---
 name: ddd
-description: Phase ②: fill a build plan's WHAT (domain models, rules, services) and Ubiquitous Language. Owns the DDD anti-assumption discipline (never guess, always ask). Sub-invoked by build-plan, or run directly on a bp.
+description: "Phase ②: fill a build plan's WHAT (domain models, rules, services) and Ubiquitous Language. Owns the DDD anti-assumption discipline (never guess, always ask). Sub-invoked by build-plan, or run directly on a bp."
 ---
 
 # /buildloop:ddd

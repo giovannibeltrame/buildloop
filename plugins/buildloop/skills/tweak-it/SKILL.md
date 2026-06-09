@@ -1,6 +1,6 @@
 ---
 name: tweak-it
-description: Phase ④: change a shipped feature (bugfix or improvement) and route it back into the loop at the right depth. Runs a rule-anchored scope checklist: lite re-enters at ② Plan it, full at ① (Re)Think it. Use when changing a shipped feature, or when measure returns "not yet".
+description: "Phase ④: change a shipped feature (bugfix or improvement) and route it back into the loop at the right depth. Runs a rule-anchored scope checklist: lite re-enters at ② Plan it, full at ① (Re)Think it. Use when changing a shipped feature, or when measure returns \"not yet\"."
 ---
 
 # /buildloop:tweak-it

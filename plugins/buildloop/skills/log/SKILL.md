@@ -1,6 +1,6 @@
 ---
 name: log
-description: Append a row to a buildloop doc's ## Log table (the single source of truth for which phase the doc is in) and surface the matching commit footer. The helper every other buildloop skill and gate-advance calls at transition time. Use when a phase advances, on intra-phase work worth recording, or when the user signals a human-owned step ("I prioritized…", "I approved the UAT").
+description: "Append a row to a buildloop doc's ## Log table (the single source of truth for which phase the doc is in) and surface the matching commit footer. The helper every other buildloop skill and gate-advance calls at transition time. Use when a phase advances, on intra-phase work worth recording, or when the user signals a human-owned step (\"I prioritized…\", \"I approved the UAT\")."
 ---
 
 # /buildloop:log

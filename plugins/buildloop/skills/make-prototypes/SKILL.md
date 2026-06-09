@@ -1,6 +1,6 @@
 ---
 name: make-prototypes
-description: Phase ①: produce lo-fi UX prototypes for a feature candidate (fc), one per option worth weighing, so does-it-worth has something concrete to judge. Use after interview-me on an fc, or when asked to sketch options for a candidate.
+description: "Phase ①: produce lo-fi UX prototypes for a feature candidate (fc), one per option worth weighing, so does-it-worth has something concrete to judge. Use after interview-me on an fc, or when asked to sketch options for a candidate."
 ---
 
 # /buildloop:make-prototypes

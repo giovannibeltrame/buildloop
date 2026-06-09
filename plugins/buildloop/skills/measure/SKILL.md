@@ -1,6 +1,6 @@
 ---
 name: measure
-description: Phase ④: judge a shipped feature's hypotheses against live prod data from the launched cohort, and record a rollout verdict (yes / not yet / invalidated). Closes the hypothesis loop. Use when a shipped feature's cohort has accrued enough telemetry to judge.
+description: "Phase ④: judge a shipped feature's hypotheses against live prod data from the launched cohort, and record a rollout verdict (yes / not yet / invalidated). Closes the hypothesis loop. Use when a shipped feature's cohort has accrued enough telemetry to judge."
 ---
 
 # /buildloop:measure

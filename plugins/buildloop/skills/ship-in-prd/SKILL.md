@@ -1,6 +1,6 @@
 ---
 name: ship-in-prd
-description: Phase ④: ship a build-gated feature: distill its fc + bp into a living feature-document, write the CHANGELOG, deploy, and release to a launch cohort behind a flag. Owns the deploy ≠ release seam. Archives the working docs. Use when build-gate reports a bp green.
+description: "Phase ④: ship a build-gated feature: distill its fc + bp into a living feature-document, write the CHANGELOG, deploy, and release to a launch cohort behind a flag. Owns the deploy ≠ release seam. Archives the working docs. Use when build-gate reports a bp green."
 ---
 
 # /buildloop:ship-in-prd

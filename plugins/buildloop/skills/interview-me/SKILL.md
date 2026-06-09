@@ -1,6 +1,6 @@
 ---
 name: interview-me
-description: Entry skill for phase ① (Re)Think it: interview the user to produce a feature candidate (fc) with WHY, narrative, hypotheses, and metrics. "Never guess, always ask." Use when a user describes a new idea or problem to build, or wants to re-sharpen an existing fc.
+description: "Entry skill for phase ① (Re)Think it: interview the user to produce a feature candidate (fc) with WHY, narrative, hypotheses, and metrics. \"Never guess, always ask.\" Use when a user describes a new idea or problem to build, or wants to re-sharpen an existing fc."
 ---
 
 # /buildloop:interview-me
