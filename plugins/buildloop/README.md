@@ -54,11 +54,12 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
 
 ## Adopting it in a project
 
-1. **Install the plugin** (see the repo root [README](../../README.md) for marketplace setup):
+1. **Install the plugin** from inside a project's Claude Code session:
    ```
    /plugin marketplace add giovannibeltrame/buildloop
    /plugin install buildloop@buildloop
    ```
+   (To commit the marketplace so everyone who clones the project gets it, see the [marketplace README](https://github.com/giovannibeltrame/buildloop#install-in-any-project).)
 2. **The methodology loads itself.** The plugin's skills and agents read the bundled `AGENTS.md` via `${CLAUDE_PLUGIN_ROOT}`, so there's nothing to copy. Your own conventions (test layout, naming, coverage policy, product docs) stay in your project, and the skills defer to them; the only project-specific bits are two `[PROJECT: …]` notes — the telemetry sink (§2.8) and the deploy/flag mechanism (in `ship-in-prd`) — which the skills that need them prompt for. *Optional:* copy `plugins/buildloop/AGENTS.md` to your repo root as `AGENTS.md` and add a `CLAUDE.md` that imports it (`@AGENTS.md`) to load it once per session (cheaper than per-agent reads) and to fill those notes in-file.
 3. **Create the docs tree** the skills expect:
    ```
