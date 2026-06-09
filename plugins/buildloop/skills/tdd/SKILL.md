@@ -5,7 +5,7 @@ description: Phase ③: drive a build plan's implementation with red → green �
 
 # /buildloop:tdd
 
-Own the build. This skill writes the failing test and the code, and is the **single source of truth for the project's TDD discipline** (`code-checker` audits against it). Apply the writing principles (AGENTS.md §1).
+Own the build. This skill writes the failing test and the code, and is the **single source of truth for the project's TDD discipline** (`code-checker` audits against it). Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1).
 
 ## Precondition
 

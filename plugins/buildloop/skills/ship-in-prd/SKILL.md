@@ -5,7 +5,7 @@ description: Phase ④: ship a build-gated feature: distill its fc + bp into a l
 
 # /buildloop:ship-in-prd
 
-Ship the feature. Distill the working docs into the living one, then deploy and release as separate acts. This skill owns the **deploy ≠ release** seam. Apply the writing principles (AGENTS.md §1).
+Ship the feature. Distill the working docs into the living one, then deploy and release as separate acts. This skill owns the **deploy ≠ release** seam. Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1).
 
 ## Deploy ≠ release
 

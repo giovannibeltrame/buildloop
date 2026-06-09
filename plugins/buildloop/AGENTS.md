@@ -1,9 +1,11 @@
 <!--
-BuildLoop operating manual (TEMPLATE).
+BuildLoop operating manual — the project-agnostic methodology, bundled with the plugin.
 
-Drop this file at your repository root as `AGENTS.md`. The buildloop plugin's
-skills and agents reference this file by section number (e.g. "AGENTS.md §2.4"),
-so keep the section numbering intact when you edit.
+The buildloop skills and agents read this file from `${CLAUDE_PLUGIN_ROOT}/AGENTS.md`
+and cite it by section number (e.g. §2.4), so keep the numbering intact when you edit.
+Optional: copy this file to your repo root as `AGENTS.md` and add a `CLAUDE.md` that
+imports it (`@AGENTS.md`) to load it once at session start, and to fill the two
+[PROJECT] notes for your stack.
 
 Scope: this file is the project-agnostic buildloop methodology: the phase/loop
 map and the gate contracts, identical for every project that adopts buildloop.
@@ -21,9 +23,9 @@ owners; it does not restate them.
 
 These apply to every text surface, for AI agents and humans alike: buildloop docs, code comments, test names, commit messages, PR bodies, and agent self-checks.
 
-- **DRY**: concise sentences. No redundancy, no over-explaining.
-- **KISS**: simple solutions. Small, targeted changes that are easy to review.
-- **YAGNI**: build only what today's task asks for. Preserve existing behavior unless the task is a behavior change. No broad refactors during localized fixes.
+- **Don't repeat yourself**: concise sentences. No redundancy, no over-explaining.
+- **Keep it simple, stupid**: simple solutions. Small, targeted changes that are easy to review.
+- **You aren't gonna need it**: build only what today's task asks for. Preserve existing behavior unless the task is a behavior change. No broad refactors during localized fixes.
 
 The think-gate and plan-gate enforce concrete style checks in their rubrics. Humans judge the rest.
 

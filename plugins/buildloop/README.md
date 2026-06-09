@@ -8,13 +8,14 @@ Four phases, three gates between them, and a log table (not a status field) as t
 
 It ships three layers:
 
-- **Declarative**: an `AGENTS.md` operating manual (provided as a template) holding the project-agnostic buildloop methodology: the phase/loop map, the gate contracts, and the writing principles.
+- **Declarative**: an `AGENTS.md` operating manual (bundled with the plugin) holding the project-agnostic buildloop methodology: the writing principles, the phase/loop map, and the gate contracts.
 - **Enforcement**: twelve skills that drive the four phases (each owns its method rule: BDD → bdd, TDD → tdd, DDD → ddd, …).
 - **Auditing**: four review agents (each gate agent owns its pass-criteria).
 
 ## What's inside
 
 ```
+AGENTS.md                     — the project-agnostic methodology; skills/agents read it via ${CLAUDE_PLUGIN_ROOT}
 skills/                       ── the four phases ──
   ① (Re)Think it
     interview-me     — create a feature candidate (fc): WHY · narrative · hypotheses · metrics
@@ -39,7 +40,6 @@ agents/
   code-checker  — build-gate clarity / complexity / coverage-classification / TDD-discipline audit
   ux-checker    — build-gate UX gate (optional, UI diffs); self-routing, read-only
 templates/
-  AGENTS.md           — the operating manual to drop at your repo root and adapt
   fc-xxxx.md          — feature candidate (working doc)
   bp-xxxx.md          — build plan (working doc)
   feature-document.md — living doc, one per feature
@@ -59,7 +59,7 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
    /plugin marketplace add giovannibeltrame/buildloop
    /plugin install buildloop@buildloop
    ```
-2. **Drop the operating manual in.** Copy `templates/AGENTS.md` to your repo root as `AGENTS.md` and fill the two `[PROJECT: …]` notes: the telemetry sink (§2.8) and the deploy/flag mechanism (in the `ship-in-prd` skill). The template is project-agnostic buildloop methodology; your own conventions (test layout, naming, coverage policy, product docs) stay in your project and the skills defer to them. **Keep the section numbering intact**: the skills and agents reference rules by number (e.g. `AGENTS.md §2.4`).
+2. **The methodology loads itself.** The plugin's skills and agents read the bundled `AGENTS.md` via `${CLAUDE_PLUGIN_ROOT}`, so there's nothing to copy. Your own conventions (test layout, naming, coverage policy, product docs) stay in your project, and the skills defer to them; the only project-specific bits are two `[PROJECT: …]` notes — the telemetry sink (§2.8) and the deploy/flag mechanism (in `ship-in-prd`) — which the skills that need them prompt for. *Optional:* copy `plugins/buildloop/AGENTS.md` to your repo root as `AGENTS.md` and add a `CLAUDE.md` that imports it (`@AGENTS.md`) to load it once per session (cheaper than per-agent reads) and to fill those notes in-file.
 3. **Create the docs tree** the skills expect:
    ```
    docs/buildloop/{working,working/archive,living}/

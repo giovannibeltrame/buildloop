@@ -5,7 +5,7 @@ description: Entry skill for phase ① (Re)Think it: interview the user to produ
 
 # /buildloop:interview-me
 
-Open phase ① by turning an idea into a feature candidate. Guard the WHAT with the anti-assumption discipline the `ddd` skill owns: never guess, always ask. Apply the writing principles (AGENTS.md §1); do not restate any rule.
+Open phase ① by turning an idea into a feature candidate. Guard the WHAT with the anti-assumption discipline the `ddd` skill owns: never guess, always ask. Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1); do not restate any rule.
 
 ## Steps
 

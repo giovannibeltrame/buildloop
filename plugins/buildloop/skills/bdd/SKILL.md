@@ -5,7 +5,7 @@ description: Phase ②: fill a build plan's HOW: acceptance scenarios in strict 
 
 # /buildloop:bdd
 
-Define how the system must behave. Write acceptance scenarios into the bp's `## HOW — behavior (BDD)` table. This skill is the **single source of truth for the BDD scenario format**: the plan-gate audits against it and `tdd` consumes the layer tags. Apply the writing principles (AGENTS.md §1).
+Define how the system must behave. Write acceptance scenarios into the bp's `## HOW — behavior (BDD)` table. This skill is the **single source of truth for the BDD scenario format**: the plan-gate audits against it and `tdd` consumes the layer tags. Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1).
 
 ## BDD scenario format
 

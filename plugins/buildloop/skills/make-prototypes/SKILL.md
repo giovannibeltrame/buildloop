@@ -5,7 +5,7 @@ description: Phase ①: produce lo-fi UX prototypes for a feature candidate (fc)
 
 # /buildloop:make-prototypes
 
-Make the candidate concrete. Produce lo-fi prototypes in the fc's `## Prototypes` section so `does-it-worth` can judge them. Apply the writing principles (AGENTS.md §1); keep it cheap and disposable.
+Make the candidate concrete. Produce lo-fi prototypes in the fc's `## Prototypes` section so `does-it-worth` can judge them. Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1); keep it cheap and disposable.
 
 ## Steps
 

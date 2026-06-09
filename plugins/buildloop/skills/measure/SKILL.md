@@ -5,7 +5,7 @@ description: Phase ④: judge a shipped feature's hypotheses against live prod d
 
 # /buildloop:measure
 
-Judge the bet. Compare the launched cohort's live metrics to the thresholds set in `interview-me`, and decide rollout. This closes the hypothesis loop (AGENTS.md §2.8). Apply the writing principles (§1).
+Judge the bet. Compare the launched cohort's live metrics to the thresholds set in `interview-me`, and decide rollout. This closes the hypothesis loop (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §2.8). Apply the writing principles (§1).
 
 ## Precondition
 

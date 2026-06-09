@@ -5,7 +5,7 @@ description: Phase ② orchestrator: create a build plan (bp) from a feature can
 
 # /buildloop:build-plan
 
-Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decomposition into one `bp-NNNN.md`, then gate it. Apply the writing principles (AGENTS.md §1).
+Turn a candidate into an executable plan. Orchestrate the WHAT, HOW, and decomposition into one `bp-NNNN.md`, then gate it. Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1).
 
 ## Steps
 

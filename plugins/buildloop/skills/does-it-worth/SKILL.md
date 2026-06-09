@@ -5,7 +5,7 @@ description: Phase ① filter: judge a feature candidate's prototypes and record
 
 # /buildloop:does-it-worth
 
-Filter the candidate before it costs anything to plan. Apply the writing principles (AGENTS.md §1); never guess (the anti-assumption discipline `ddd` owns).
+Filter the candidate before it costs anything to plan. Apply the writing principles (`${CLAUDE_PLUGIN_ROOT}/AGENTS.md` §1); never guess (the anti-assumption discipline `ddd` owns).
 
 ## Steps
 
