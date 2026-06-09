@@ -45,7 +45,7 @@ Or commit it so everyone who clones the project gets it, by adding to the projec
 
 ## References
 
-BuildLoop doesn't invent a method — it wires together established ones:
+BuildLoop wires together established methods:
 
 - **DDD** — Domain-Driven Design: model the problem in the domain's own language before writing code (Eric Evans, *Domain-Driven Design*, 2003).
 - **BDD** — Behavior-Driven Development: specify behavior as concrete, executable scenarios (Dan North, *Introducing BDD*, 2006).
@@ -53,7 +53,7 @@ BuildLoop doesn't invent a method — it wires together established ones:
 - **DRY** — Don't Repeat Yourself: every piece of knowledge has one authoritative representation (Hunt & Thomas, *The Pragmatic Programmer*, 1999).
 - **Spotify's product-building workflow** — the Think it · Build it · Ship it · Tweak it loop that BuildLoop's four phases mirror.[^spotify]
 
-And shaped, without ceremony, by KISS, YAGNI, spec-driven development, and harness engineering.
+Also shaped by KISS, YAGNI, spec-driven development, and harness engineering.
 
 [^spotify]: Henrik Kniberg, *How Spotify Builds Products*, Crisp, 2013 — <https://blog.crisp.se/wp-content/uploads/2013/01/HowSpotifyBuildsProducts.pdf>
 

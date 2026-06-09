@@ -60,7 +60,7 @@ Built-in Claude skills couple in directly at the build-gate (`/simplify`, `/code
    /plugin install buildloop@buildloop
    ```
    (To commit the marketplace so everyone who clones the project gets it, see the [marketplace README](https://github.com/giovannibeltrame/buildloop#install-in-any-project).)
-2. **The methodology loads itself.** The plugin's skills and agents read the bundled `AGENTS.md` via `${CLAUDE_PLUGIN_ROOT}`, so there's nothing to copy. Your own conventions (test layout, naming, coverage policy, product docs) stay in your project, and the skills defer to them; the only project-specific bits are two `[PROJECT: …]` notes — the telemetry sink (§2.8) and the deploy/flag mechanism (in `ship-in-prd`) — which the skills that need them prompt for. *Optional:* copy `plugins/buildloop/AGENTS.md` to your repo root as `AGENTS.md` and add a `CLAUDE.md` that imports it (`@AGENTS.md`) to load it once per session (cheaper than per-agent reads) and to fill those notes in-file.
+2. **The methodology loads itself.** The plugin's skills and agents read the bundled `AGENTS.md` via `${CLAUDE_PLUGIN_ROOT}`, so there's nothing to copy. Your own conventions (test layout, naming, coverage policy, product docs) stay in your project, and the skills defer to them; the only project-specific bits are two `[PROJECT: …]` notes (the telemetry sink in §2.8 and the deploy/flag mechanism in `ship-in-prd`), which the skills that need them prompt for. *Optional:* copy `plugins/buildloop/AGENTS.md` to your repo root as `AGENTS.md` and add a `CLAUDE.md` that imports it (`@AGENTS.md`) to load it once per session (cheaper than per-agent reads) and to fill those notes in-file.
 3. **Create the docs tree** the skills expect — three folders:
    ```
    docs/buildloop/working/           ← active fc-NNNN / bp-NNNN docs
@@ -86,7 +86,7 @@ A new idea enters at ①; a change to a shipped feature enters via `tweak-it`. S
 
 ## Use any skill or agent on its own
 
-You don't have to run the whole loop. Because the gates check *state* (artifacts present + valid), never *history*, every skill and agent also works standalone — invoke just the one you want:
+You don't have to run the whole loop. Because the gates check *state* (artifacts present + valid), never *history*, every skill and agent also works standalone. Invoke just the one you want:
 
 - `/buildloop:ddd` to model a domain you're stuck on, `/buildloop:bdd` to draft acceptance scenarios, `/buildloop:tdd` to drive a single change red → green → refactor.
 - The `code-checker` or `ux-checker` agent to audit a diff with no upstream doc.
