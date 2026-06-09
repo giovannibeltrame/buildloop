@@ -5,11 +5,12 @@ The `buildloop:` skills are markdown orchestrations; the small deterministic
 bits they rely on live here as one self-contained, dependency-free CLI, so the
 skills call one command instead of re-deriving the logic each turn:
 
-    buildloop next-id fix
-    buildloop doc-id fix 22
-    buildloop open-questions docs/buildloop/epics/epic-0030.md
-    buildloop log <doc> "human, manual" "status 4 → 5"
-    buildloop can-promote <cnst-doc> tests/e2e
+    buildloop next-id fc
+    buildloop doc-id bp 22
+    buildloop open-questions docs/buildloop/working/fc-0030.md
+    buildloop current-phase docs/buildloop/working/fc-0030.md
+    buildloop log <doc> interview-me "created"
+    buildloop log <doc> "think-gate · interview-me advances" "gate passed" --to "② Plan it"
 
 Claude Code adds this plugin's `bin/` directory to the Bash tool's PATH while the
 plugin is enabled, so `buildloop` is callable directly with no path or `python -m`.
@@ -18,6 +19,11 @@ Paths resolve against the **consuming project's working directory** (where Claud
 runs), not this script's install location. The docs root defaults to
 `./docs/buildloop` and is overridable with the `BUILDLOOP_DOCS_DIR` env var or the
 `--docs-dir` flag.
+
+State model: a doc's current phase is derived from its `## Log` table, never from
+a status field. The table has fixed columns — `when | who | phase → | what` — and
+the current phase is the To-side of the last row whose `phase →` cell carries a
+transition (work rows leave it as `—`).
 """
 
 from __future__ import annotations
@@ -28,7 +34,11 @@ import re
 import sys
 from pathlib import Path
 
-KIND_DIRS = {"epic": "epics", "fix": "bugfixes", "hyp": "hypotheses", "cnst": "constants"}
+# fc (feature candidate) and bp (build plan) are working docs; both live flat in
+# `working/`, with shipped originals moved under `working/archive/`.
+KINDS = ("fc", "bp")
+WORKING_DIR = "working"
+WORK_ROW_PHASE = "—"  # em dash marks an intra-phase work row (no transition)
 
 
 def docs_dir(override: str | None = None) -> Path:
@@ -42,13 +52,17 @@ def docs_dir(override: str | None = None) -> Path:
 
 
 def next_sequence(kind: str, root: Path) -> int:
-    """Return the next zero-padded sequence number for a doc kind (1 if none)."""
-    directory = Path(root) / KIND_DIRS[kind]
-    pattern = re.compile(rf"{kind}-(\d+)\.md$")
+    """Return the next sequence number for a doc kind (1 if none).
+
+    Scans `working/` recursively so archived docs still reserve their numbers —
+    a shipped fc-0007 must never be reissued to a new candidate.
+    """
+    working = Path(root) / WORKING_DIR
+    pattern = re.compile(rf"^{kind}-(\d+)\.md$")
     highest = 0
-    if directory.exists():
-        for path in directory.glob(f"{kind}-*.md"):
-            match = pattern.search(path.name)
+    if working.exists():
+        for path in working.rglob(f"{kind}-*.md"):
+            match = pattern.match(path.name)
             if match:
                 highest = max(highest, int(match.group(1)))
     return highest + 1
@@ -67,78 +81,104 @@ def has_open_questions(text: str) -> bool:
     return bool(re.search(r"(?m)^\s*(?:[-*]|\d+\.)\s+\S", match.group("body")))
 
 
-def format_log_line(date: str, tag: str, text: str) -> str:
-    return f"- [{tag}] {date} {text}"
+# --- log table: the single source of truth for "where are we" ----------------
 
 
-def append_log_entry(path: Path, line: str) -> None:
-    """Insert a process-log line at the end of the doc's `## Process log` section.
+def _split_row(line: str) -> list[str]:
+    """Cells of a markdown table row `| a | b |` → ['a', 'b'] (outer pipes dropped)."""
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
 
-    A doc may carry a trailing section (e.g. `## Refinement Outcome`) after the
-    process log, so the entry is placed before the next `##` heading — not blindly
-    at end-of-file. Falls back to EOF if there is no process-log section.
+
+def _is_separator(cells: list[str]) -> bool:
+    """True for a `|---|---|` separator row (cells are only dashes/colons)."""
+    return all(set(cell) <= {"-", ":"} and cell for cell in cells)
+
+
+def _log_section_bounds(lines: list[str]) -> tuple[int, int] | None:
+    """Return [start, end) line indices of the body under the `## Log` heading."""
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"(?i)^##\s+log\s*$", line):
+            start = i + 1
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start, len(lines)):
+        if re.match(r"^##\s+", lines[j]):
+            end = j
+            break
+    return start, end
+
+
+def _table_line_indices(lines: list[str], start: int, end: int) -> list[int]:
+    """Indices of `|`-delimited table lines within [start, end)."""
+    return [i for i in range(start, end) if lines[i].lstrip().startswith("|")]
+
+
+def log_data_rows(text: str) -> list[list[str]]:
+    """Data rows (header + separator skipped) of the `## Log` table, as cell lists."""
+    lines = text.splitlines()
+    bounds = _log_section_bounds(lines)
+    if not bounds:
+        return []
+    table = _table_line_indices(lines, *bounds)
+    rows = []
+    for i in table:
+        cells = _split_row(lines[i])
+        if _is_separator(cells):
+            continue
+        if cells and cells[0].lower() == "when":  # header
+            continue
+        rows.append(cells)
+    return rows
+
+
+def current_phase(text: str) -> str | None:
+    """The doc's current phase: To-side of the last row with a real `phase →`.
+
+    Returns None when no transition row exists yet (doc not in the loop).
+    """
+    for cells in reversed(log_data_rows(text)):
+        phase = cells[2] if len(cells) > 2 else ""
+        if phase and phase != WORK_ROW_PHASE:
+            return phase.split("→")[-1].strip()
+    return None
+
+
+def append_log_row(path: Path, who: str, what: str, to_phase: str | None, when: str) -> str:
+    """Append a row to the doc's `## Log` table; return the rendered row.
+
+    A `to_phase` makes it a transition row — From is auto-filled from the doc's
+    current phase, so callers name only the destination. No `to_phase` → a work
+    row with `phase →` left as the em-dash sentinel.
     """
     path = Path(path)
     text = path.read_text(encoding="utf-8")
-    heading = re.search(r"(?im)^##\s+process log\s*$", text)
-    if not heading:
-        path.write_text(f"{text.rstrip(chr(10))}\n{line}\n", encoding="utf-8")
-        return
-    section_start = heading.end()
-    nxt = re.search(r"(?m)^##\s+", text[section_start:])
-    if nxt:
-        boundary = section_start + nxt.start()
-        section = text[section_start:boundary].rstrip("\n")
-        new_text = f"{text[:section_start]}{section}\n{line}\n\n{text[boundary:]}"
+    if to_phase:
+        frm = current_phase(text)
+        phase_cell = f"{frm} → {to_phase}" if frm else f"→ {to_phase}"
     else:
-        new_text = f"{text.rstrip(chr(10))}\n{line}\n"
-    path.write_text(new_text, encoding="utf-8")
+        phase_cell = WORK_ROW_PHASE
+    row = f"| {when} | {who} | {phase_cell} | {what} |"
+
+    lines = text.splitlines()
+    bounds = _log_section_bounds(lines)
+    if not bounds:
+        raise SystemExit(f"{path}: no `## Log` section to append to")
+    table = _table_line_indices(lines, *bounds)
+    if not table:
+        raise SystemExit(f"{path}: `## Log` section has no table")
+    lines.insert(table[-1] + 1, row)
+    trailing = "\n" if text.endswith("\n") else ""
+    path.write_text("\n".join(lines) + trailing, encoding="utf-8")
+    return row
 
 
-# --- constant lifecycle helpers (inlined so this CLI has zero dependencies) ---
+def _now() -> str:
+    from datetime import datetime
 
-_LABEL = re.compile(r"(?mi)^Label:\s*\*\*(?P<label>\w+)\*\*")
-_CNST_ID = re.compile(r"cnst-(?P<num>\d+)", re.IGNORECASE)
-
-
-def parse_label(text: str) -> str | None:
-    """Return the constant's lifecycle label (Proposed / Active / …) or None."""
-    match = _LABEL.search(text)
-    return match.group("label") if match else None
-
-
-def cnst_number(id_or_name: str) -> str | None:
-    """Return the NNNN digits from a constant id or filename (e.g. cnst-0007)."""
-    match = _CNST_ID.search(id_or_name)
-    return match.group("num") if match else None
-
-
-def e2e_matches(num: str, e2e_dir) -> list[Path]:
-    """Return e2e test files under `e2e_dir` carrying constant number `num`."""
-    e2e_dir = Path(e2e_dir)
-    return list(e2e_dir.glob(f"*cnst*{num}*")) if e2e_dir.exists() else []
-
-
-def promotion_blockers(cnst_text: str, cnst_id: str, e2e_dir: Path) -> list[str]:
-    """Return reasons a constant cannot be promoted Proposed → Active (empty = OK).
-
-    Two gates per the constant lifecycle in AGENTS.md §3.3: the constant must
-    currently be Proposed, and it must have an e2e test under `e2e_dir`.
-    """
-    blockers: list[str] = []
-    label = parse_label(cnst_text)
-    if label != "Proposed":
-        blockers.append(f"{cnst_id} is {label or 'unlabeled'}, not Proposed — nothing to promote")
-    num = cnst_number(cnst_id) or cnst_id
-    if not e2e_matches(num, e2e_dir):
-        blockers.append(f"{cnst_id} has no e2e test under {e2e_dir} (expected *cnst*{num}*)")
-    return blockers
-
-
-def _today() -> str:
-    from datetime import date
-
-    return date.today().isoformat()
+    return datetime.now().strftime("%Y-%m-%d %H:%M")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -146,7 +186,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p_next = sub.add_parser("next-id")
-    p_next.add_argument("kind", choices=KIND_DIRS)
+    p_next.add_argument("kind", choices=KINDS)
     p_next.add_argument(
         "--docs-dir",
         default=None,
@@ -154,21 +194,21 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     p_docid = sub.add_parser("doc-id")
-    p_docid.add_argument("kind", choices=KIND_DIRS)
+    p_docid.add_argument("kind", choices=KINDS)
     p_docid.add_argument("number", type=int)
 
     p_oq = sub.add_parser("open-questions")
     p_oq.add_argument("doc")
 
+    p_phase = sub.add_parser("current-phase")
+    p_phase.add_argument("doc")
+
     p_log = sub.add_parser("log")
     p_log.add_argument("doc")
-    p_log.add_argument("tag")
-    p_log.add_argument("text")
-    p_log.add_argument("--date", default=None)
-
-    p_promote = sub.add_parser("can-promote")
-    p_promote.add_argument("doc")
-    p_promote.add_argument("e2e_dir")
+    p_log.add_argument("who")
+    p_log.add_argument("what")
+    p_log.add_argument("--to", default=None, help="destination phase → makes this a transition row")
+    p_log.add_argument("--when", default=None, help="override the timestamp (default: now)")
 
     args = parser.parse_args(argv)
 
@@ -182,20 +222,12 @@ def main(argv: list[str] | None = None) -> int:
         blocked = has_open_questions(Path(args.doc).read_text(encoding="utf-8"))
         print("open-questions" if blocked else "clean")
         return 1 if blocked else 0
-    if args.cmd == "log":
-        line = format_log_line(args.date or _today(), args.tag, args.text)
-        append_log_entry(Path(args.doc), line)
-        print(line)
+    if args.cmd == "current-phase":
+        phase = current_phase(Path(args.doc).read_text(encoding="utf-8"))
+        print(phase if phase else "none")
         return 0
-    if args.cmd == "can-promote":
-        text = Path(args.doc).read_text(encoding="utf-8")
-        cnst_id = Path(args.doc).stem
-        blockers = promotion_blockers(text, cnst_id, Path(args.e2e_dir))
-        if blockers:
-            for blocker in blockers:
-                print(f"BLOCKED {blocker}")
-            return 1
-        print(f"{cnst_id}: promotable")
+    if args.cmd == "log":
+        print(append_log_row(Path(args.doc), args.who, args.what, args.to, args.when or _now()))
         return 0
     return 2  # pragma: no cover — unreachable: subparsers are required=True
 

@@ -1,44 +1,23 @@
 # BuildLoop
+
 A simple tool for building software with AI.
 
-## Purpose
+> **(Re)Think it → Plan it → Build it → Ship it. Loop again 🔄**
 
-Simplicity is key. Less complexity means more tokens for being used.
-
-## Workflow
-
-Discover. Refine. Code. Test. Implement. Loop again 🔄
-
-## Core principles, alphabet soup
-
-- BDD
-- DDD
-- DRY
-- Harness engineering
-- KISS
-- SDD
-- TDD
-- YAGNI
-
-## Some challenges on dev with AI
-
-1. over-generation
-2. slop
-3. hallucinations
-4. one-shot hero
-5. premature victory
-6. fake-tests
+Less complexity leaves more tokens for the work itself.
 
 ## What's here
 
 BuildLoop is a **Claude Code plugin marketplace**. It currently ships one plugin:
 
-- **[`buildloop`](plugins/buildloop/)** — the loop above, made operational: six skills that drive a status flow (refine → plan → implement → review → UAT), three review agents (code-checker, doc-validator, test-writer), a zero-dependency `buildloop` helper, and an `AGENTS.md` operating-manual template you adapt to your repo.
+- **[`buildloop`](plugins/buildloop/)** — the loop above, made operational: skills that drive four phases through three gates, four review agents, a zero-dependency `buildloop` helper, and a bundled `AGENTS.md` methodology its skills and agents read.
 
 ```
 .claude-plugin/marketplace.json   ← marketplace manifest
-plugins/buildloop/              ← the plugin (skills, agents, bin, template)
+plugins/buildloop/                ← the plugin (skills, agents, bin, templates)
 ```
+
+See the [plugin README](plugins/buildloop/) for the full inventory, the loop map, and the adoption guide.
 
 ## Install in any project
 
@@ -49,7 +28,7 @@ From inside a project's Claude Code session:
 /plugin install buildloop@buildloop
 ```
 
-Or commit it so everyone who clones the project gets it automatically — add to the project's `.claude/settings.json`:
+Or commit it so everyone who clones the project gets it, by adding to the project's `.claude/settings.json`:
 
 ```json
 {
@@ -64,4 +43,17 @@ Or commit it so everyone who clones the project gets it automatically — add to
 }
 ```
 
-Then follow the plugin's [adoption guide](plugins/buildloop/README.md): drop `templates/AGENTS.md` at your repo root, create `docs/buildloop/{epics,bugfixes,hypotheses,constants}/`, and fill in the `[PROJECT: …]` notes.
+## References
+
+BuildLoop wires together established methods:
+
+- **DDD** — Domain-Driven Design: model the problem in the domain's own language before writing code (Eric Evans, *Domain-Driven Design*, 2003).
+- **BDD** — Behavior-Driven Development: specify behavior as concrete, executable scenarios (Dan North, *Introducing BDD*, 2006).
+- **TDD** — Test-Driven Development: red → green → refactor, one failing test at a time (Kent Beck, *Test-Driven Development: By Example*, 2002).
+- **DRY** — Don't Repeat Yourself: every piece of knowledge has one authoritative representation (Hunt & Thomas, *The Pragmatic Programmer*, 1999).
+- **Spotify's product-building workflow** — the Think it · Build it · Ship it · Tweak it loop that BuildLoop's four phases mirror.[^spotify]
+
+Also shaped by KISS, YAGNI, spec-driven development, and harness engineering.
+
+[^spotify]: Henrik Kniberg, *How Spotify Builds Products*, Crisp, 2013 — <https://blog.crisp.se/wp-content/uploads/2013/01/HowSpotifyBuildsProducts.pdf>
+
